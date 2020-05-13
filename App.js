@@ -35,7 +35,7 @@ export default function App(props) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync();
-        console.log('Here are all your calendars:');
+        console.log('Here are all your calendars:1');
         console.log({ calendars });
       }
     }
