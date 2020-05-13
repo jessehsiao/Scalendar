@@ -49,6 +49,11 @@ export default function App(props) {
     console.log("hihi")
     return (
       <View style={styles.container}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
     </View>
     );
   }
