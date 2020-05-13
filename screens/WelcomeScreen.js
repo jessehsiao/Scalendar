@@ -13,7 +13,7 @@ export default function WelcomeScreen() {
                 style={{position: 'absolute',left: 0,right: 0,top: 0,height: 700}}
             />
             <TouchableOpacity onPress={getCalendarUser} style={styles.button1Style}>
-                <Text style={styles.button1TextStyle}>start to use</Text>
+                <Text style={styles.button1TextStyle}>Im alchol boy for test branch</Text>
             </TouchableOpacity>
         </View>
     );
