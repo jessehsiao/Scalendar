@@ -1,27 +1,43 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Navigator, Image, YellowBox, ImageBackground} from 'react-native';
+import background from '../assets/sign.png'; 
+import buttonImage from '../assets/signbutton.png'; 
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-//import { MonoText } from '../components/StyledText';
-import { LinearGradient } from 'expo-linear-gradient';
+import mainCalendar from '../screens/mainCalendar.js';
+
+const Stack = createStackNavigator();
+
 import * as Calendar from 'expo-calendar';
-
-export default function WelcomeScreen() {
-    return(
-        <View style={styles.container}>
-            <LinearGradient 
+            /* <LinearGradient 
                 colors={['#87CEFF','#FFBBFF']}
                 style={{position: 'absolute',left: 0,right: 0,top: 0,height: 700}}
-            />
-            <TouchableOpacity onPress={getCalendarUser} style={styles.button1Style}>
-                <Text style={styles.button1TextStyle}>start to use</Text>
-            </TouchableOpacity>
+            /> */
+
+export default function WelcomeScreen({navigation}) {
+    return(
+        <View style={styles.container}>
+            <ImageBackground source = {background} style={{width: '100%', height: '100%'}}>
+    
+            <TouchableOpacity onPress={() => navigation.navigate('mainCal')} style={styles.button1Style}>    
+            <Image source={buttonImage}></Image>        
+               </TouchableOpacity> 
+            </ImageBackground>
         </View>
-    );
+    );   
 } 
-async function getCalendarUser(){
-    const calendars = await Calendar.getCalendarsAsync();
-    console.log(calendars[0].source.name);     
-  }
+
+  
+
+// async function getCalendarUser(){
+//     const calendars = await Calendar.getCalendarsAsync();
+//     console.log(calendars[0].source.name);     
+//   }
+  
+  //class Demo extends React.Component{
+    
+//} 
 
 const styles = StyleSheet.create({
     container: {
@@ -30,12 +46,14 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     button1Style:{
-        backgroundColor: '#008CBA',
         padding: 20,
         borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        bottom : -250,
     },
     button1TextStyle: {
         fontSize: 20,
         color: '#fff'
     },
-  });
+});
