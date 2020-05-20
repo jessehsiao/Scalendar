@@ -1,6 +1,7 @@
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
-import {Text, TouchableOpacity, View,StyleSheet} from 'react-native';
+import {Text, TouchableOpacity, View,StyleSheet, Image} from 'react-native';
 import * as React from 'react';
+import button from '../assets/monthbutton.png';
 
 
 export default function mainCalendar ({navigation}){
@@ -9,17 +10,17 @@ export default function mainCalendar ({navigation}){
       <Calendar
   // Specify style for calendar container element. Default = {}
   style={{
-    borderWidth: 1,
-    borderColor: 'gray',
-    height: 350,
-    backgroundColor:'#ffffff'
-    
+    borderWidth:1,
+    borderColor: '#DDD6F3',
+    height: 400,
+    backgroundColor:'#DDD6F3'
+
   }}
   // Specify theme properties to override specific styles for calendar parts. Default = {}
   theme={{
-    backgroundColor: '#ffffff',
-    calendarBackground: '#ffffff',
-    textSectionTitleColor: '#b6c1cd',
+    backgroundColor: '#C9D6FF',
+    calendarBackground: '#DDD6F3',
+    textSectionTitleColor: '#5E5E5E',
     selectedDayBackgroundColor: 'yellow',
     selectedDayTextColor: 'yellow',
     todayTextColor: '#00adf5',
@@ -29,42 +30,50 @@ export default function mainCalendar ({navigation}){
     selectedDotColor: '#ffffff',
     arrowColor: 'orange',
     disabledArrowColor: '#d9e1e8',
-    monthTextColor: 'blue',
+    monthTextColor: 'white',
     indicatorColor: 'blue',
     textDayFontWeight: '300',
     textMonthFontWeight: 'bold',
     textDayHeaderFontWeight: '300',
     textDayFontSize: 16,
     textMonthFontSize: 16,
-    textDayHeaderFontSize: 16
+    textDayHeaderFontSize: 16,
+    
+    
   }}
-/>      
-    <TouchableOpacity onPress={() => navigation.navigate('CalList')} style={styles.button1Style} >    
-          <Text style={styles.button1TextStyle}>Calendar list</Text>   
+/>  
+  
+    <TouchableOpacity onPress={() => navigation.navigate('CalList')} style={styles.button1Style} >       
+          
+          
     </TouchableOpacity>  
+  
     </View>
   );
 }
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FAACA8',
   },
   button1Style:{
       padding: 20,
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      bottom : -60,
-      backgroundColor : 'yellow',
+      bottom : 418,
+      marginLeft:100,
       width : 200,
   },
   button1TextStyle: {
       fontSize: 20,
-      color: 'black',
+      color: '#A6A7A7',
       justifyContent: 'center',
       alignItems: 'center',
   },
 });
 
-    
+
