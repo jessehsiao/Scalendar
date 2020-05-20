@@ -7,6 +7,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import * as Calendar from 'expo-calendar';
 import WelcomeScreen from './screens/WelcomeScreen';
+import mainCalendar from './screens/mainCalendar';
+import calendarList from './screens/calendarList';
 
 const Stack = createStackNavigator();
 
@@ -35,7 +37,7 @@ export default function App(props) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync();
-        console.log('Here are all your calendars:');
+        console.log('Here are all your calendars:1');
         console.log({ calendars });
       }
     }
@@ -43,18 +45,25 @@ export default function App(props) {
     calendarPerrmission()
   }, []);
 
+  /*
+    Container /
+    -----> Switch /area1
+              ------> Switch /area1/hi
+    -----> Switch /area2
+              ------> Switch /area2/hi       
+  */
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null
   } else {
     console.log("hihi")
     return (
-      <View style={styles.container}>
-        <NavigationContainer>
-          <Stack.Navigator>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Welcome">
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-    </View>
+            <Stack.Screen name="mainCal" component={mainCalendar} />
+            <Stack.Screen name="CalList" component={calendarList} />
+        </Stack.Navigator>
+    </NavigationContainer>
     );
   }
 }
@@ -63,6 +72,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFD9EC',
-
   },
 });
