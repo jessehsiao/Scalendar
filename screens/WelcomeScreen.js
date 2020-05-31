@@ -5,9 +5,8 @@ import buttonImage from '../assets/signbutton.png';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import mainCalendar from '../screens/mainCalendar.js';
+//import mainCalendar from '../screens/mainCalendar.js';
 
-const Stack = createStackNavigator();
 
 import * as Calendar from 'expo-calendar';
             /* <LinearGradient 
@@ -24,7 +23,7 @@ export default function WelcomeScreen({navigation}) {
                 </TouchableOpacity>
             </ImageBackground>           
         </View>
-    );   
+    );
 } 
 
   

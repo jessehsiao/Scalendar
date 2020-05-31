@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View,Text} from 'react-native';
+//import { Platform, StatusBar, StyleSheet, View,Text} from 'react-native';
 import { SplashScreen } from 'expo';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -14,14 +14,11 @@ const Stack = createStackNavigator();
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
-  const [initialNavigationState] = React.useState();
-  const containerRef = React.useRef();
   // Load any resources or data that we need prior to rendering the app 載入所有這個app需要的data
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide();
-
         // Load our initial navigation state
 
         // Load fonts
@@ -37,8 +34,8 @@ export default function App(props) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync();
-        console.log('Here are all your calendars:1');
-        console.log({ calendars });
+        //console.log('Here are all your calendars:1');
+        //console.log({ calendars });
       }
     }
     loadResourcesAndDataAsync();
@@ -59,18 +56,11 @@ export default function App(props) {
     return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Welcome">
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="mainCal" component={mainCalendar} />
-            <Stack.Screen name="CalList" component={calendarList} />
+            <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen options={{headerShown: false}} name="mainCal" component={mainCalendar} />
+            <Stack.Screen name="Calendar List" component={calendarList} />
         </Stack.Navigator>
     </NavigationContainer>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFD9EC',
-  },
-});
