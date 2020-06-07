@@ -27,6 +27,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       //selectedTask: null,
       //isDateTimePickerVisible: false,
     };
+
     returnData=(data)=>{ 
       console.log('mainCalendar端: 剛剛從哪回來? ',data)
       this.setState({selectedDate: data}, ()=>{
@@ -38,12 +39,13 @@ export default class mainCalendar extends Component{//class 一定要render()
       //console.log('Hello:',this.state.selectedDate)
       //this.calendarRef.setSelectedDate(data);//改變標記的日子
       //this.calendarRef.updateWeekView(data);
-      
     }
-    
-     
 
-
+    setModalfalse=()=>{
+      this.setState(
+        {isCreateModalVisible: false}, 
+        () => {console.log(this.state.isCreateModalVisible)},);
+    }
   render(){
     const {
       state: {
@@ -64,9 +66,6 @@ export default class mainCalendar extends Component{//class 一定要render()
 
     return(
     <>
-
-
-
       <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
         <CalendarStrip
                 ref={ref => {this.calendarRef = ref;}}/////////////////////////////////////////////Home頁面上方的calendar bar
@@ -149,7 +148,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
         <View style={styles.createOptionContainer}>
           <TouchableOpacity style={styles.updateButton}  onPress={() => {
-                    this.setState({isCreateModalVisible: false,}, () => {
+                    this.setState({isCreateModalVisible: false}, () => {
                       console.log(isCreateModalVisible)},
                     );
                 }}>
@@ -158,11 +157,10 @@ export default class mainCalendar extends Component{//class 一定要render()
                           color: '#fff',
                         }}>手動輸入</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.deleteButton} onPress={() => {
-                    this.setState({isCreateModalVisible: false,}, () => {
-                      console.log(isCreateModalVisible)}
-                    );
-                }}>
+                      navigation.navigate('Camera',{back: this.setModalfalse})
+                  }}>
             <Text style={{fontSize: 18,
                           textAlign: 'center',
                           color: '#fff',
