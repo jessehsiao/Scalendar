@@ -2,8 +2,6 @@ import React from 'react';
 import {View, StyleSheet, Modal, Platform } from 'react-native';
 
 
-
-// = ({ isModalVisible, children }) =>
 export class OptionInCreate extends React.Component {
   
   render() {
@@ -12,7 +10,7 @@ export class OptionInCreate extends React.Component {
       <Modal
         animationType="slide"
         transparent
-        visible={isCreateModalVisible} 
+        visible={isCreateModalVisible}
         onRequestClose={() => null}
       >
         <View
