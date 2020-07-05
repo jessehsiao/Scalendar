@@ -2,8 +2,6 @@ import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Navigator, Image, YellowBox, ImageBackground, Button} from 'react-native';
 import background from '../assets/sign.png'; 
 import buttonImage from '../assets/signbutton.png'; 
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 
 //import mainCalendar from '../screens/mainCalendar.js';
 

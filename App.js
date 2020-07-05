@@ -10,6 +10,8 @@ import WelcomeScreen from './screens/WelcomeScreen';
 import mainCalendar from './screens/mainCalendar';
 import calendarList from './screens/calendarList';
 import ScanCamera from './screens/ScanCamera';
+import HandTask from './screens/HandTask';
+import TodoStore from './data/TodoStore';
 
 const Stack = createStackNavigator();
 
@@ -56,23 +58,26 @@ export default function App(props) {
   } else {
     console.log("hihi")
     return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome">
-            <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen options={{title:'Home' ,headerShown: false}} name="mainCal" component={mainCalendar} />
-            <Stack.Screen options={{headerShown: false}} name="Camera" component={ScanCamera} />
-            <Stack.Screen name="Calendar List" component={calendarList} options={{
-                  title: 'calendar List',
-                  headerStyle: {
-                    backgroundColor: '#D1BBFF',
-                  },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                  },
-        }}/>
-        </Stack.Navigator>
-    </NavigationContainer>
+      <TodoStore>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Welcome">
+              <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />
+              <Stack.Screen options={{title:'Home' ,headerShown: false}} name="mainCal" component={mainCalendar} />
+              <Stack.Screen options={{headerShown: false}} name="Camera" component={ScanCamera} />
+              <Stack.Screen name="Calendar List" component={calendarList} options={{
+                    title: 'calendar List',
+                    headerStyle: {
+                      backgroundColor: '#D1BBFF',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                      fontWeight: 'bold',
+                    },
+          }}/>
+              <Stack.Screen options={{headerShown: false}} name="HandTask" component={HandTask} />
+          </Stack.Navigator>
+      </NavigationContainer>
+    </TodoStore>
     );
   }
 }

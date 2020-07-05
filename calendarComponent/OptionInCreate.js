@@ -38,11 +38,11 @@ const styles = StyleSheet.create({
       top: 450,
       width: 327,
       borderRadius: 20,
-      backgroundColor: '#ffffff',
+   
       alignSelf: 'center',//跳出在中間
     },
     container: {
       flex: 1,
-      backgroundColor: 'rgba(255,179,246,0.4)',
+      backgroundColor: 'rgba(219,143,255,0.3)',
     },
   });
