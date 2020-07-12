@@ -10,14 +10,22 @@ export default class calendarList extends Component{
   constructor(props){
     super(props)
     this.state = {
-      markedDay:{[this.props.route.params.selected]:{selected: true}}
+      markedDay:this.getMarkedDates(),
     }
   }
+  /*
   select(day) {
     console.log(this.props.route.params.selected)
     const markedDay = {[day.dayString]:{selected: true}}
     this.setState({markedDay: markedDay})
   }
+  */
+
+  getMarkedDates = () => { 
+    const marked = {}; 
+    this.props.route.params.markedDate.forEach(item => { marked[item] = {marked: true}; }); 
+    return JSON.parse(JSON.stringify(marked)); 
+  };
   
   render(){
     //const { navigation } = this.props;
@@ -41,7 +49,7 @@ export default class calendarList extends Component{
           
           onDayPress={(date) => {
             console.log('you click this', date);
-            this.select.bind(this)
+            //this.select.bind(this)
             const selectedDate = date.dateString;
             console.log("你在calendarList 選擇了: ",selectedDate);
             this.props.route.params.onGoBack(selectedDate);

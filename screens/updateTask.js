@@ -4,42 +4,27 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 //import { useState } from "react";
 //const { width: vw } = Dimensions.get('window');
 import moment from 'moment';
-import uuid from 'uuid';
+
 import { Context } from '../data/Context';
 
 export default class HandTasks extends Component{
     state = {
-        // selectedDay_start: {
-        //     [`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}-${moment().format('hh')}-${moment().format('mm')}`]:
-        //     {
-        //       selected: true,
-        //     },
-        //   },
-        // selectedDay_end: {
-        //     [`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}-${moment().format('hh')}-${moment().format('mm')}`]:
-        //     {
-        //       selected: true,
-        //     },
-        // },
         currentDay: moment().format(),
         //alarmTime: moment().format(),
-        selectedDay_start: moment().format(),
-        selectedDay_end: moment().format(),
+        selectedDay_start: moment(this.props.route.params.selectTask.startDateTime, 'YYYY-MM-DD, H:mm'),
+        selectedDay_end: moment(this.props.route.params.selectTask.endDateTime, 'YYYY-MM-DD, H:mm'),
         isDateTimePickerVisible_start: false,
         isDateTimePickerVisible_end: false,
         isDatePickerVisible_start: false,
         isDatePickerVisible_end: false,
-        taskText: '',
-        placeText: '',
-        notesText: '',
+        taskText: this.props.route.params.selectTask.title,
+        placeText: this.props.route.params.selectTask.place,
+        notesText: this.props.route.params.selectTask.notes,
         createTodo: {},
-        alarm: 'No',
+        alarm: this.props.route.params.selectTask.alarm,
         // keyboardHeight: 0,
-        isHoleDaySet: false,
-
-        
+        isHoleDaySet: this.props.route.params.selectTask.holeDay,
     };
-
     componentDidMount() {
         this.keyboardDidShowListener = Keyboard.addListener(
           'keyboardDidShow',
@@ -206,9 +191,7 @@ export default class HandTasks extends Component{
           .minute(minute)
         
         this.setState({
-        //   alarmTime: newModifiedDay,
           selectedDay_start:selectday_start,
-        //   selectedDay_end:newModifiedDay,
         });
     
         this._hideDatePicker_start();
@@ -231,24 +214,16 @@ export default class HandTasks extends Component{
           .minute(minute_end)
           
         this.setState({
-        //   alarmTime: newModifiedDay,
           selectedDay_end:selectday_end,
-        //   selectedDay_end:newModifiedDay,
+
         });
     
         this._hideDatePicker_end();
         console.log('A date_end has been picked: ', date_end);
     };
-    // const [pickerMode, setPickerMode] = useState(null);
-    // // showDatePicker = () => {
-    //     setPickerMode("date");
-    // };
-    
-    // showTimePicker = () => {
-    //     setPickerMode("time");
-    // };
 
-    _handleCreateEventData = async value =>{
+    //主要更新function
+    _handleUpdateEventData = async value =>{
         const {
             state: {
                 selectedDay_start,
@@ -262,32 +237,32 @@ export default class HandTasks extends Component{
             props: { navigation },
           } = this;
         const createTodo={
-            key: uuid(),
+            key: this.props.route.params.selectTask.key,
             startDate: `${moment(selectedDay_start).format('YYYY')}-${moment(selectedDay_start).format('MM')}-${moment(selectedDay_start).format('DD')}`,
             endDate: `${moment(selectedDay_end).format('YYYY')}-${moment(selectedDay_end).format('MM')}-${moment(selectedDay_end).format('DD')}`,////新加的
             title:taskText,
             place: placeText,
             holeDay:isHoleDaySet,
-            startDateTime:moment(selectedDay_start).format('YYYY-MM-DD, H:mm'),
-            endDateTime: moment(selectedDay_end).format('YYYY-MM-DD, H:mm'),
-            startTime: moment(selectedDay_start).format('H:mm'),
-            endTime: moment(selectedDay_end).format('H:mm'),
+            startDateTime:moment(selectedDay_start).format('YYYY-MM-DD, h:mm a'),
+            endDateTime: moment(selectedDay_end).format('YYYY-MM-DD, h:mm a'),
+            startTime: moment(selectedDay_start).format('h:mm a'),
+            endTime: moment(selectedDay_end).format('h:mm a'),
             alarm: alarm,
-            notes: notesText, 
-            color: `rgb(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))})`,
+            notes: notesText,
+            color: this.props.route.params.selectTask.color,
             markedDot: 
             {
                 date: selectedDay_start,////新加的
                 dots: [
                   {
-                    key: uuid(),
+                    key: this.props.route.params.selectTask.markedDot.dots.key,
                     color: '#2E66E7',
                     selectedDotColor: '#2E66E7',
                   },
                 ],
             },
         };
-        await value.updateTodo(createTodo);//////////////////////////////////////有問題 why?
+        await value.updateSelectedTask(createTodo);//////////////////////////////////////有問題 why?
         this.props.route.params.onGoBack2(createTodo.startDate);
         navigation.navigate('mainCal');//跳轉回mainCal頁面
     }
@@ -303,8 +278,6 @@ export default class HandTasks extends Component{
                 notesText,
                 placeText,
                 isHoleDaySet,
-                //isDateTimePickerVisible_start,
-                //isDateTimePickerVisible_end,
               },
             props: { navigation },
         } = this;
@@ -350,6 +323,7 @@ export default class HandTasks extends Component{
                         <Text style={styles.notes}>
                             行程名稱
                         </Text>
+                        
                         <TextInput
                             style={styles.title}
                             onChangeText={text => this.setState({ taskText: text })}
@@ -425,7 +399,7 @@ export default class HandTasks extends Component{
                             {isHoleDaySet === false ? (<Picker.Item label="1hr" value="1hr" />) :(<Picker.Item label="前兩天(20:00)" value="前兩天(20:00)" />)}
                             {isHoleDaySet === false ? (<Picker.Item label="2hr" value="2hr" />) :null}
 
-                        </Picker>
+                          </Picker>
 
                             <View style={styles.seperator} />
 
@@ -439,7 +413,7 @@ export default class HandTasks extends Component{
                             placeholder="請輸入備註"/> 
 
                     </View>
-                    <TouchableOpacity style={styles.createTaskButton } onPress={async () => await this._handleCreateEventData(value)}>
+                    <TouchableOpacity style={styles.createTaskButton } onPress={async () => await this._handleUpdateEventData(value)}>
                         <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                             確定
                         </Text>
@@ -469,17 +443,7 @@ const styles = StyleSheet.create({
         marginLeft:-100,
         bottom:-100,
     },
-    // finishButton:{
-    //     width: 70,
-    //     height: 100,
-    //     alignSelf: 'center',
-    //     marginTop: 5,
-    //     borderRadius: 10,
-    //     justifyContent: 'center',
-    //     marginRight: -100,
-    //     marginLeft:100,
-    //     bottom:0,
-    // },
+
     newTask:{
         alignSelf: 'center',
         fontSize: 20,

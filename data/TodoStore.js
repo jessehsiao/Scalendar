@@ -21,33 +21,17 @@ export default class TodoStore extends Component {
   //製作個各個function
 
   _deleteSelectedTask = async item => {
-
     const previousTodo = [...this.state.todo];
-    const newTodo = previousTodo.map(data => {
-      if (item.startDate === data.startDate) {
-        const previousTodoList = [...data.task];
-        const newTodoList = previousTodoList.filter(list => {
-          if (list.key === item.todo.key) {
-            return false;
-          }
-          return true;
-        });
-
-        data.task = newTodoList;
-        return data;
-      }
-      return data;
-    });
-    const checkForEmpty = newTodo.filter(data => {
-      if (data.task.length === 0) {
+    const newTodo = previousTodo.filter(data => {
+      if (item.key === data.key) {
         return false;
       }
       return true;
     });
     try {
-      await AsyncStorage.setItem('TODO', JSON.stringify(checkForEmpty));
+      await AsyncStorage.setItem('TODO', JSON.stringify(newTodo));//類似localstorage的東西 https://docs.expo.io/versions/v37.0.0/react-native/asyncstorage/
       this.setState({
-        todo: checkForEmpty,
+        todo: newTodo,
       });
     } catch (error) {
       // Error saving data
@@ -57,15 +41,8 @@ export default class TodoStore extends Component {
   _updateSelectedTask = async item => {
     const previousTodo = [...this.state.todo];
     const newTodo = previousTodo.map(data => {
-      if (item.date === data.date) {
-        const previousTodoList = [...data.todoList];
-        const newTodoList = previousTodoList.map(list => {
-          if (list.key === item.todo.key) {
-            return item.todo;
-          }
-          return list;
-        });
-        data.todoList = newTodoList;
+      if (item.key === data.key) {
+        data=item;
         return data;
       }
       return data;
@@ -89,7 +66,7 @@ export default class TodoStore extends Component {
         });
       }
       console.log('this is asyncStorage')
-      console.log(todo)
+      //console.log(todo)
     } catch (error) {
       // Error saving data
     }
@@ -98,7 +75,7 @@ export default class TodoStore extends Component {
   _updateTodo = async item => {
     console.log('here i am')
 
-      const newTodo = [...this.state.todo, item];
+      const newTodo = [...this.state.todo, item];//把item加到後面
       try {
         await AsyncStorage.setItem('TODO', JSON.stringify(newTodo));
         this.setState({

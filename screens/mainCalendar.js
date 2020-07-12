@@ -1,6 +1,6 @@
 
 import React,{Component} from 'react';
-import {View, Image, TouchableOpacity, AsyncStorage, ScrollView, Text, Dimensions, TextInput, Switch, StyleSheet, Alert, Platform,} from 'react-native';
+import {View, Image, TouchableOpacity, AsyncStorage, ScrollView, Text, Dimensions, TextInput, StyleSheet, Alert, Platform,} from 'react-native';
 import moment from 'moment';
 import * as Calendar from 'expo-calendar';
 import CalendarStrip from 'react-native-calendar-strip';
@@ -25,6 +25,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       selectedDate: `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`,
       todoList: [],
       markedDate: [], 
+      markedDateCalendarList: [],
       isTaskModelVisible: false,
       isCreateModalVisible: false,
       selectedTask: null,
@@ -33,7 +34,24 @@ export default class mainCalendar extends Component{//class 一定要render()
     async componentDidMount(){
       this._handleTask();
       console.log('this is todoList in compomentDidMount')
+      
       console.log(this.state.todoList)
+    }
+
+    handleDelete = async (selected,value) => {
+      Alert.alert(
+        "確定要刪除嗎?",
+        "你爽就好",
+        [
+          {
+            text: "取消",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "確定", onPress: async() => {await value.deleteSelectedTask(selected);this._updateCurrentTask(this.state.selectedDate);this.setState({isTaskModalVisible: false});} }
+        ],
+        { cancelable: false }
+      );
     }
 
     _handleTask = async () =>{
@@ -41,7 +59,7 @@ export default class mainCalendar extends Component{//class 一定要render()
         const value = await AsyncStorage.getItem('TODO');
         if(value!==null){
           console.log('this is value in handleTask()')
-          console.log(value)
+          //console.log(value)
           this._updateCurrentTask(this.state.selectedDate);
         }
 
@@ -49,15 +67,21 @@ export default class mainCalendar extends Component{//class 一定要render()
 
       }
     };
+    handleMarkedDateCalendarList = () =>{
+      const markedDatesCalendarList = this.state.markedDate.map(data=>{return moment(data.date).format('YYYY-MM-DD')})
+      console.log('這是asedfasdfasdfasdfasdfsadfa',markedDatesCalendarList)
 
-    _updateCurrentTask = async selectedDate =>{///////////////////////////////有問題
+      return markedDatesCalendarList;
+    }
+
+    _updateCurrentTask = async selectedDate =>{
       try{
           console.log('有進到updateCurrentTask')
           const value = await AsyncStorage.getItem('TODO');
           if(value!==null){
             const todoList = JSON.parse(value);
             console.log('***************************')
-            console.log(todoList)
+            //console.log(todoList)
             const markDot = todoList.map(item => item.markedDot);
             const todoLists = todoList.filter(item => {
               if (selectedDate === item.startDate || moment(selectedDate).isBetween(item.startDate, item.endDate)===true || selectedDate === item.endDate) {//把當天的行程抓出來
@@ -66,13 +90,13 @@ export default class mainCalendar extends Component{//class 一定要render()
               return false;
             });
             if (todoLists.length !== 0) {
+              const sortedLists = todoLists.sort((a,b)=>a.startDateTime.localeCompare(b.startDateTime))
+              console.log("this is sortedLists: ",sortedLists)
               this.setState({
                 markedDate: markDot,
-                todoList: todoLists
+                todoList: sortedLists,
               });
-              console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-              //console.log(this.state.markedDate)
-              console.log(this.state.todoList)
+              //console.log(this.state.todoList)
             } else {
               this.setState({
                 markedDate: markDot,
@@ -83,10 +107,9 @@ export default class mainCalendar extends Component{//class 一定要render()
       }catch(error){
         //error
       }
+      console.log("這是markedDate")
+      console.log(this.state.markedDate)
     };
-
-
-
     returnData=(data)=>{ 
       console.log('mainCalendar端: 剛剛從哪回來? ',data)
       this.setState({selectedDate: data}, ()=>{
@@ -129,6 +152,7 @@ export default class mainCalendar extends Component{//class 一定要render()
         todoList,
         markedDate,
         //currentDate,
+        markedDateCalendarList,
         isTaskModalVisible,
         isCreateModalVisible,
         selectedTask,
@@ -165,7 +189,9 @@ export default class mainCalendar extends Component{//class 一定要render()
                 <View style={styles.seperator} />
                 <TouchableOpacity
                   style={styles.updateButton}
-                  onPress={()=>{}}
+                  onPress={()=>{this.setState(
+                    {isTaskModalVisible: false}, 
+                    () => {console.log(this.state.isTaskModalVisible)},), navigation.navigate('updateTask',{selectTask:this.state.selectedTask,onGoBack2: this.returnData2})}}
                 >
                   <Text
                     style={{
@@ -175,6 +201,20 @@ export default class mainCalendar extends Component{//class 一定要render()
                     }}
                   >
                     編輯
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={async ()=>{this.handleDelete(selectedTask,value);}}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: 'center',
+                      color: '#fff',
+                    }}
+                  >
+                    刪除
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -258,7 +298,8 @@ export default class mainCalendar extends Component{//class 一定要render()
                 />
                 <TouchableOpacity onPress={()=>{
                   navigation.navigate('Calendar List',{
-                    selected: this.state.selectedDate,
+                    //selected: this.state.selectedDate,
+                    markedDate:this.handleMarkedDateCalendarList(),
                     onGoBack: this.returnData,})}} style={styles.button1Style}>     
                     <Text></Text>  
                 </TouchableOpacity> 
@@ -270,8 +311,8 @@ export default class mainCalendar extends Component{//class 一定要render()
                       console.log(isCreateModalVisible)}
                     );
                 }}>  
-                </TouchableOpacity> 
-                
+                </TouchableOpacity>   
+      
 
         
             <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
@@ -548,17 +589,27 @@ const styles = StyleSheet.create({
     width: 200,
     height: 40,
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 5,
     justifyContent: 'center',
     //marginRight: 10,
   },
+  deleteButton:{
+    backgroundColor: '#2E66E7',
+    width: 200,
+    height: 40,
+    alignSelf: 'center',
+    marginTop: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+
   backButton: {
     backgroundColor: '#2E66E7',
     width: 200,
     height: 40,
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 5,
     justifyContent: 'center',
   },
@@ -567,7 +618,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'black',
     alignSelf: 'center',
-    marginVertical: 22,
+    marginVertical: 18,
   },
 
 

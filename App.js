@@ -12,6 +12,7 @@ import calendarList from './screens/calendarList';
 import ScanCamera from './screens/ScanCamera';
 import HandTask from './screens/HandTask';
 import TodoStore from './data/TodoStore';
+import updateTask from './screens/updateTask';
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,7 @@ export default function App(props) {
                     },
           }}/>
               <Stack.Screen options={{headerShown: false}} name="HandTask" component={HandTask} />
+              <Stack.Screen options={{headerShown: false}} name="updateTask" component={updateTask} />
           </Stack.Navigator>
       </NavigationContainer>
     </TodoStore>
