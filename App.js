@@ -1,7 +1,6 @@
 import * as React from 'react';
 //import { Platform, StatusBar, StyleSheet, View,Text} from 'react-native';
 import { SplashScreen } from 'expo';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -13,16 +12,21 @@ import ScanCamera from './screens/ScanCamera';
 import HandTask from './screens/HandTask';
 import TodoStore from './data/TodoStore';
 import updateTask from './screens/updateTask';
-
+import photoScreen from './screens/photoScreen';
+import editScanTask from './screens/editScanTask';
+import { AsyncStorage } from 'react-native';
 const Stack = createStackNavigator();
 
+
 export default function App(props) {
+
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   // Load any resources or data that we need prior to rendering the app 載入所有這個app需要的data
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide();
+        AsyncStorage.clear()
         // Load our initial navigation state
 
         // Load fonts
@@ -38,8 +42,19 @@ export default function App(props) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync();
-        //console.log('Here are all your calendars:1');
-        //console.log({ calendars });
+        /*
+        fetch('http://140.115.87.178:8000/api/User.json', {
+          method: 'POST',
+          headers: { 
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json' 
+                  },
+          body: JSON.stringify({useremail:calendars[0].source.name})
+        })
+        .then((response) => JSON.stringify(response.json())) 
+        .then((responseData) => { console.log("response: " + responseData); })
+        .catch((err) => { console.log(err); });
+        */
       }
     }
     
@@ -77,6 +92,8 @@ export default function App(props) {
           }}/>
               <Stack.Screen options={{headerShown: false}} name="HandTask" component={HandTask} />
               <Stack.Screen options={{headerShown: false}} name="updateTask" component={updateTask} />
+              <Stack.Screen options={{title:'你選擇的照片'}} name="photoScreen" component={photoScreen} />
+              <Stack.Screen options={{headerShown: false}} name="editScanTask" component={editScanTask} />
           </Stack.Navigator>
       </NavigationContainer>
     </TodoStore>

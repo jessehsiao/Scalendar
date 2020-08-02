@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import {View,Text,ScrollView,Dimensions,Keyboard,StyleSheet,TouchableOpacity,Image,TextInput,Switch,Picker} from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import * as Calendar from 'expo-calendar';
 //import { useState } from "react";
 //const { width: vw } = Dimensions.get('window');
 import moment from 'moment';
@@ -9,18 +10,7 @@ import { Context } from '../data/Context';
 
 export default class HandTasks extends Component{
     state = {
-        // selectedDay_start: {
-        //     [`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}-${moment().format('hh')}-${moment().format('mm')}`]:
-        //     {
-        //       selected: true,
-        //     },
-        //   },
-        // selectedDay_end: {
-        //     [`${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}-${moment().format('hh')}-${moment().format('mm')}`]:
-        //     {
-        //       selected: true,
-        //     },
-        // },
+
         currentDay: moment().format(),
         //alarmTime: moment().format(),
         selectedDay_start: moment().format(),
@@ -34,6 +24,7 @@ export default class HandTasks extends Component{
         notesText: '',
         createTodo: {},
         alarm: 'No',
+        //useremail: '',
         // keyboardHeight: 0,
         isHoleDaySet: false,
 
@@ -158,7 +149,7 @@ export default class HandTasks extends Component{
         this.setState({
         //   alarmTime: newModifiedDay,
           selectedDay_start:selectday_start,
-        //   selectedDay_end:newModifiedDay,
+          selectedDay_end:selectday_start,
         });
     
         this._hideDateTimePicker_start();
@@ -263,15 +254,16 @@ export default class HandTasks extends Component{
           } = this;
         const createTodo={
             key: uuid(),
+            //useremail:useremail,
             startDate: `${moment(selectedDay_start).format('YYYY')}-${moment(selectedDay_start).format('MM')}-${moment(selectedDay_start).format('DD')}`,
             endDate: `${moment(selectedDay_end).format('YYYY')}-${moment(selectedDay_end).format('MM')}-${moment(selectedDay_end).format('DD')}`,////新加的
             title:taskText,
             place: placeText,
             holeDay:isHoleDaySet,
-            startDateTime:moment(selectedDay_start).format('YYYY-MM-DD, H:mm'),
-            endDateTime: moment(selectedDay_end).format('YYYY-MM-DD, H:mm'),
-            startTime: moment(selectedDay_start).format('H:mm'),
-            endTime: moment(selectedDay_end).format('H:mm'),
+            //startDateTime:moment(selectedDay_start).format('YYYY-MM-DD, H:mm'),
+            //endDateTime: moment(selectedDay_end).format('YYYY-MM-DD, H:mm'),
+            startDateTime:moment(selectedDay_start).format(),
+            endDateTime: moment(selectedDay_end).format(),
             alarm: alarm,
             notes: notesText, 
             color: `rgb(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))})`,

@@ -3,6 +3,8 @@ import { AsyncStorage } from 'react-native';
 import moment from 'moment';
 import { Context } from './Context';
 
+
+
 //儲存與更新刪除形成的操作
 export default class TodoStore extends Component {
   state = {
@@ -73,17 +75,18 @@ export default class TodoStore extends Component {
   }
 
   _updateTodo = async item => {
-    console.log('here i am')
-
-      const newTodo = [...this.state.todo, item];//把item加到後面
+      console.log('here i am')
+      //const newTodo = [...this.state.todo,item]
+      const newTodo = this.state.todo.concat(item)
       try {
         await AsyncStorage.setItem('TODO', JSON.stringify(newTodo));
         this.setState({
           todo: newTodo,
-        });
+        },console.log(this.state.todo));
       } catch (error) {
         // Error saving data
       }
+    //})
   };
 
   _deleteTodo = () => {};

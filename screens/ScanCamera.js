@@ -1,15 +1,20 @@
 import React from 'react';
-import { StyleSheet, Text, View ,TouchableOpacity,Platform, } from 'react-native';
+import { StyleSheet, Text, View ,TouchableOpacity,Platform, Image} from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import { FontAwesome, Ionicons,AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+//import { Task } from '../calendarComponent/Task';
 
 
 export default class ScanCamera extends React.Component {
   state = {
     hasPermission: null,
     cameraType: Camera.Constants.Type.back,
+    photoB64:"",
+    takeImageText:"",
+    imageInPicker: null
+    //isTaskModalVisible: false
   }
 
   async componentDidMount() {
@@ -33,34 +38,59 @@ export default class ScanCamera extends React.Component {
     this.props.navigation.navigate('mainCal');
   }
 
-  // takePicture = async () => {
-  //   if (this.camera) {
-  //     let photo = await this.camera.takePictureAsync();
-
-  //   }
-  // }
-
+  takePicture = async() => {
+    this.setState({
+      takeImageText: "... PROCESSING PICTURE ..."
+    });
+    this.camera.takePictureAsync({skipProcessing:true ,base64: true}).then((data) => {
+        this.setState({
+            takeImageText: "PICTURE TAKEN",
+            photoB64: data.base64,
+            imageInPicker: data.uri
+            //isTaskModalVisible: true
+        }, () => this.props.navigation.navigate('photoScreen',{
+          photoB64: this.state.photoB64,
+          imageInPicker:this.state.imageInPicker
+        }))
+    })
+  }
+/*
   takePicture() {
     this.setState({
         takeImageText: "... PROCESSING PICTURE ..."
     });
-    this.camera.takePictureAsync({ skipProcessing: true }).then((data) => {
+    this.camera.takePictureAsync({ skipProcessing: true ,base64: true}).then((data) => {
         this.setState({
             takeImageText: "PICTURE TAKEN",
-            photo: data.uri
-        }, console.log(data.uri))
+            photo: data.base64
+        }, console.log(data.base64))
     })
 }
+*/
 
   pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
+    try{
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          base64:true,
+          //quality: 1
+        });
+        if (!result.cancelled) {
+          this.setState({ imageInPicker: result.uri, photoB64:result.base64},() => this.props.navigation.navigate('photoScreen',{
+            photoB64: this.state.photoB64,
+            imageInPicker:this.state.imageInPicker
+          }));
+          //console.log(result.base64)
+        }  
+    }catch (E) {
+      console.log(E);
+    }
   }
   
 
   render(){
-    const { hasPermission } = this.state
+    const { hasPermission,takeImageText} = this.state
     if (hasPermission === null) {
       return <View/>;
     } else if (hasPermission === false) {
@@ -119,3 +149,23 @@ export default class ScanCamera extends React.Component {
   }
   
 }
+
+
+const styles = StyleSheet.create({
+  taskContainer: {
+    height: 550,
+    width: 327,
+    alignSelf: 'center',
+    borderRadius: 20,
+    shadowColor: '#2E66E7',
+    backgroundColor: '#ffffff',
+    shadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    shadowRadius: 20,
+    shadowOpacity: 0.2,
+    elevation: 5,
+    padding: 22,
+  },
+})

@@ -31,17 +31,23 @@ export default class mainCalendar extends Component{//class 一定要render()
       selectedTask: null,
       //isDateTimePickerVisible: false,
     };
+
     async componentDidMount(){
       this._handleTask();
       console.log('this is todoList in compomentDidMount')
-      
       console.log(this.state.todoList)
+      const value = await AsyncStorage.getItem('TODO');
+      if(value!==null){
+        const todoList = JSON.parse(value);
+        const markDot = todoList.map(item => item.markedDot);
+        this.setState({markedDate: markDot})
+      }
     }
 
     handleDelete = async (selected,value) => {
       Alert.alert(
         "確定要刪除嗎?",
-        "你爽就好",
+        "都可以",
         [
           {
             text: "取消",
@@ -76,21 +82,26 @@ export default class mainCalendar extends Component{//class 一定要render()
 
     _updateCurrentTask = async selectedDate =>{
       try{
+          //const selectedDate = moment(selectedDate1).format('YYYY-MM-DD')
           console.log('有進到updateCurrentTask')
           const value = await AsyncStorage.getItem('TODO');
           if(value!==null){
             const todoList = JSON.parse(value);
             console.log('***************************')
             //console.log(todoList)
+
             const markDot = todoList.map(item => item.markedDot);
+
             const todoLists = todoList.filter(item => {
               if (selectedDate === item.startDate || moment(selectedDate).isBetween(item.startDate, item.endDate)===true || selectedDate === item.endDate) {//把當天的行程抓出來
                 return true;
               }
               return false;
             });
+
             if (todoLists.length !== 0) {
-              const sortedLists = todoLists.sort((a,b)=>a.startDateTime.localeCompare(b.startDateTime))
+              const sortedLists = todoLists.sort((a,b)=> {return moment(a.startDateTime).diff(b.startDateTime);})
+              //const sortedLists = todoLists.sort((a,b)=>a.startDateTime.localeCompare(b.startDateTime))
               console.log("this is sortedLists: ",sortedLists)
               this.setState({
                 markedDate: markDot,
@@ -110,6 +121,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       console.log("這是markedDate")
       console.log(this.state.markedDate)
     };
+
     returnData=(data)=>{ 
       console.log('mainCalendar端: 剛剛從哪回來? ',data)
       this.setState({selectedDate: data}, ()=>{
@@ -140,8 +152,23 @@ export default class mainCalendar extends Component{//class 一定要render()
         {isCreateModalVisible: false}, 
         () => {console.log(this.state.isCreateModalVisible)},);
     }
+/*
+    test=async()=>{//成功了 還在測試中
+      const calendars = await Calendar.getCalendarsAsync();
+      console.log('Here are all your calendars:1');
+      console.log(calendars[0].source.name);
 
 
+      fetch('http://140.115.87.178:8000/api/taskData.json')
+      .then(response => response.json())
+      .then(data => {data.map(item => {
+        if(item.useremail===calendars[0].source.name){
+          console.log(item)
+          return item
+        }
+      })});
+    }
+*/
  
 
   render(){
@@ -177,9 +204,9 @@ export default class mainCalendar extends Component{//class 一定要render()
                       //color: '#fff',
                     }}>{selectedTask.title}</Text>
                 <View style={styles.seperator} />
-                <Text>開始: {selectedTask.startDateTime}</Text>
+                <Text>開始: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
                 <View style={styles.seperator} />
-                <Text>結束: {selectedTask.endDateTime}</Text>
+                <Text>結束: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
                 <View style={styles.seperator} />
                 <Text>地點: {selectedTask.place}</Text>
                 <View style={styles.seperator} />
@@ -312,9 +339,14 @@ export default class mainCalendar extends Component{//class 一定要render()
                     );
                 }}>  
                 </TouchableOpacity>   
-      
 
-        
+{/* 
+                <TouchableOpacity 
+                  style={styles.floatinBtn222}
+                  onPress={() => {AsyncStorage.clear()}}>  
+                </TouchableOpacity>   
+*/}   
+  
             <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
             
                 <TouchableOpacity style={styles.handButton}  onPress={() => {
@@ -337,8 +369,6 @@ export default class mainCalendar extends Component{//class 一定要render()
                 </TouchableOpacity>
               
             </OptionInCreate>
-
-            
 
           <View
             style={{
@@ -404,14 +434,14 @@ export default class mainCalendar extends Component{//class 一定要render()
                                 fontSize: 15,
                                 //marginRight: 5,
                               }}//小字顯示日期
-                            >{item.startDateTime}</Text>
+                            >{moment(item.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
                             <Text
                               style={{
                                 color: '#BBBBBB',
                                 fontSize: 15,
                                 //marginRight: 5,
                               }}//小字顯示日期
-                            >{item.endDateTime}</Text>
+                            >{moment(item.endDateTime).format('YYYY-MM-DD, H:MM')}</Text>
                           </View>
                         </View>
                       </View>

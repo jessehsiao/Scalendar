@@ -1,30 +1,49 @@
 import React,{Component} from 'react';
 import {View,Text,ScrollView,Dimensions,Keyboard,StyleSheet,TouchableOpacity,Image,TextInput,Switch,Picker} from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-//import { useState } from "react";
-//const { width: vw } = Dimensions.get('window');
-import moment from 'moment';
 
+import moment from 'moment';
+import uuid from 'uuid';
 import { Context } from '../data/Context';
 
-export default class HandTasks extends Component{
+
+export default class editScanTask extends Component{
     state = {
         currentDay: moment().format(),
-        //alarmTime: moment().format(),
-        selectedDay_start: moment(this.props.route.params.selectTask.startDateTime, 'YYYY-MM-DD, H:mm'),
-        selectedDay_end: moment(this.props.route.params.selectTask.endDateTime, 'YYYY-MM-DD, H:mm'),
+        selectedDay_start: this.props.route.params.taskData.map(task => {
+            return task.startDate + " " + task.startTime
+        }),
+        selectedDay_end: this.props.route.params.taskData.map(task => {
+            return task.endDate + " " + task.endTime
+        }),
         isDateTimePickerVisible_start: false,
         isDateTimePickerVisible_end: false,
         isDatePickerVisible_start: false,
         isDatePickerVisible_end: false,
-        taskText: this.props.route.params.selectTask.title,
-        placeText: this.props.route.params.selectTask.place,
-        notesText: this.props.route.params.selectTask.notes,
-        createTodo: {},
-        alarm: this.props.route.params.selectTask.alarm,
+        taskText: this.props.route.params.taskData.map(task => {
+            return task.title
+        }),
+        placeText: this.props.route.params.taskData.map(task => {
+            return ""
+        }),
+        notesText: this.props.route.params.taskData.map(task => {
+            return ""
+        }),
+        //createTodo: {},
+        alarm: this.props.route.params.taskData.map(task => {
+            return "No"
+        }),
         // keyboardHeight: 0,
-        isHoleDaySet: this.props.route.params.selectTask.holeDay,
-    };
+
+        isHoleDaySet: this.props.route.params.taskData.map(task => {
+            return false
+        }),
+        
+        task: this.props.route.params.taskData,
+        currentIndex: 0,
+    };    
+
+
     componentDidMount() {
         this.keyboardDidShowListener = Keyboard.addListener(
           'keyboardDidShow',
@@ -56,6 +75,7 @@ export default class HandTasks extends Component{
     });
     };
 
+/*
     handleHoleDaySet = () => {
         //設定整日的初始日期
         const { selectedDay_end } = this.state;
@@ -109,25 +129,27 @@ export default class HandTasks extends Component{
             });
         }
     };
-    _showDatePicker_start = () => this.setState({ isDatePickerVisible_start: true });
+*/
+    //_showDatePicker_start = () => this.setState({ isDatePickerVisible_start: true });
 
-    _hideDatePicker_start = () => this.setState({ isDatePickerVisible_start: false });
+    //_hideDatePicker_start = () => this.setState({ isDatePickerVisible_start: false });
 
-    _showDatePicker_end = () => this.setState({ isDatePickerVisible_end: true });
+    //_showDatePicker_end = () => this.setState({ isDatePickerVisible_end: true });
 
-    _hideDatePicker_end = () => this.setState({ isDatePickerVisible_end: false });
+    //_hideDatePicker_end = () => this.setState({ isDatePickerVisible_end: false });
 
-    _showDateTimePicker_start = () => this.setState({ isDateTimePickerVisible_start: true });
+    _showDateTimePicker_start = (index) => this.setState({ isDateTimePickerVisible_start: true,currentIndex:index});
 
     _hideDateTimePicker_start = () => this.setState({ isDateTimePickerVisible_start: false });
 
-    _showDateTimePicker_end = () => this.setState({ isDateTimePickerVisible_end: true });
+    _showDateTimePicker_end = (index) => this.setState({ isDateTimePickerVisible_end: true,currentIndex:index});
 
     _hideDateTimePicker_end = () => this.setState({ isDateTimePickerVisible_end: false });
 
+////////////////////////////////////////////////////////很大的問題 要怎麼知道這次條日期是條哪個行程
     _handleDateTimePicked_start = date_start => {
         const { selectedDay_start } = this.state;
-        const selectedDatePicked_start = selectedDay_start;
+        const selectedDatePicked_start = selectedDay_start[this.state.currentIndex];
         const year = moment(date_start).year();
         const month = moment(date_start).month();
         const day = moment(date_start).date();
@@ -142,7 +164,11 @@ export default class HandTasks extends Component{
         
         this.setState({
         //   alarmTime: newModifiedDay,
-          selectedDay_start:selectday_start,
+          selectedDay_start:[
+            ...this.state.selectedDay_start.slice(0, this.state.currentIndex),
+            selectday_start,
+            ...this.state.selectedDay_start.slice(this.state.currentIndex+1, this.state.task.length)
+            ]
         //   selectedDay_end:newModifiedDay,
         });
     
@@ -152,7 +178,7 @@ export default class HandTasks extends Component{
 
     _handleDateTimePicked_end = date_end => {
         const { selectedDay_end } = this.state;
-        const selectedDatePicked_end = selectedDay_end;
+        const selectedDatePicked_end = selectedDay_end[this.state.currentIndex];
         const year_end = moment(date_end).year();
         const month_end = moment(date_end).month();
         const day_end = moment(date_end).date();
@@ -167,7 +193,11 @@ export default class HandTasks extends Component{
         
         this.setState({
         //   alarmTime: newModifiedDay,
-          selectedDay_end:selectday_end,
+          selectedDay_end:[
+            ...this.state.selectedDay_end.slice(0, this.state.currentIndex),
+            selectday_end,
+            ...this.state.selectedDay_end.slice(this.state.currentIndex+1, this.state.task.length)
+            ]
         //   selectedDay_end:newModifiedDay,
         });
     
@@ -175,6 +205,8 @@ export default class HandTasks extends Component{
         console.log('A date_end has been picked: ', date_end);
     };
 
+
+/*
     _handleDatePicked_start = date_start => {
         const { selectedDay_start } = this.state;
         const selectedDatePicked_start = selectedDay_start;
@@ -221,7 +253,7 @@ export default class HandTasks extends Component{
         this._hideDatePicker_end();
         console.log('A date_end has been picked: ', date_end);
     };
-
+*/
     //主要更新function
     _handleUpdateEventData = async value =>{
         const {
@@ -236,34 +268,38 @@ export default class HandTasks extends Component{
             },
             props: { navigation },
           } = this;
-        const createTodo={
-            key: this.props.route.params.selectTask.key,
-            startDate: `${moment(selectedDay_start).format('YYYY')}-${moment(selectedDay_start).format('MM')}-${moment(selectedDay_start).format('DD')}`,
-            endDate: `${moment(selectedDay_end).format('YYYY')}-${moment(selectedDay_end).format('MM')}-${moment(selectedDay_end).format('DD')}`,////新加的
-            title:taskText,
-            place: placeText,
-            holeDay:isHoleDaySet,
-            startDateTime:moment(selectedDay_start).format(),
-            endDateTime: moment(selectedDay_end).format(),
-            startTime: moment(selectedDay_start).format('h:mm a'),
-            endTime: moment(selectedDay_end).format('h:mm a'),
-            alarm: alarm,
-            notes: notesText,
-            color: this.props.route.params.selectTask.color,
-            markedDot: 
-            {
-                date: selectedDay_start,////新加的
-                dots: [
-                  {
-                    key: this.props.route.params.selectTask.markedDot.dots.key,
-                    color: '#2E66E7',
-                    selectedDotColor: '#2E66E7',
-                  },
-                ],
-            },
-        };
-        await value.updateSelectedTask(createTodo);//////////////////////////////////////有問題 why?
-        this.props.route.params.onGoBack2(createTodo.startDate);
+
+        const createTodo=taskText.map((item,index) => {
+            const task={
+                key: uuid(),
+                //useremail:useremail,
+                startDate: `${moment(selectedDay_start[index]).format('YYYY')}-${moment(selectedDay_start[index]).format('MM')}-${moment(selectedDay_start[index]).format('DD')}`,
+                endDate: `${moment(selectedDay_end[index]).format('YYYY')}-${moment(selectedDay_end[index]).format('MM')}-${moment(selectedDay_end[index]).format('DD')}`,////新加的
+                title:taskText[index],
+                place: placeText[index],
+                holeDay:isHoleDaySet[index],
+                startDateTime:moment(selectedDay_start[index]).format(),
+                endDateTime: moment(selectedDay_end[index]).format(),
+                alarm: alarm[index],
+                notes: notesText[index], 
+                color: `rgb(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))})`,
+                markedDot: 
+                {
+                    date: moment(selectedDay_start[index]).format(),////新加的
+                    dots: [
+                      {
+                        key: uuid(),
+                        color: '#2E66E7',
+                        selectedDotColor: '#2E66E7',
+                      },
+                    ],
+                },
+            }
+            return task;
+            //value.updateTodo(task);//////////////////////////////////////有問題 why?
+        })
+        console.log(createTodo)
+        await value.updateTodo(createTodo);//////////////////////////////////////有問題 why?
         navigation.navigate('mainCal');//跳轉回mainCal頁面
     }
     
@@ -272,20 +308,22 @@ export default class HandTasks extends Component{
             state: {
                 selectedDay_start,
                 selectedDay_end,
-                // currentDay,
                 taskText,
-                // visibleHeight,
                 notesText,
                 placeText,
                 isHoleDaySet,
+                task,
+                alarm,
+                //currentIndex,
+                //currentTask
               },
             props: { navigation },
         } = this;
 
 
         return(
-          <Context.Consumer>
-           {value => (
+        <Context.Consumer>
+            {value => (
             <>
             <DateTimePicker
                 isVisible={this.state.isDateTimePickerVisible_start}
@@ -299,7 +337,7 @@ export default class HandTasks extends Component{
                 onCancel={this._hideDateTimePicker_end}
                 mode = 'datetime'               
             />
-            <DateTimePicker
+{/*            <DateTimePicker
                 isVisible={this.state.isDatePickerVisible_start}
                 onConfirm={this._handleDatePicked_start}
                 onCancel={this._hideDatePicker_start}
@@ -310,109 +348,143 @@ export default class HandTasks extends Component{
                 onConfirm={this._handleDatePicked_end}
                 onCancel={this._hideDatePicker_end}
                 mode = 'date'               
-            />          
+/>     */}     
             <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
                 <ScrollView contentContainerStyle={{paddingBottom: 100,}}>
                     <View>
                         <Text style = {styles.newTask}>
-                            編輯行程
+                            編輯辨識結果
                         </Text>
                     </View>
-
-                    <View style={styles.taskContainer}>
-                        <Text style={styles.notes}>
-                            行程名稱
-                        </Text>
-                        
-                        <TextInput
-                            style={styles.title}
-                            onChangeText={text => this.setState({ taskText: text })}
-                            value={taskText}
-                            placeholder="請輸入行程名稱"
-                            onSubmitEditing={Keyboard.dismiss}
-                        />     
-                    
-                        <View style={styles.seperator} />
-                        
-                        
-                    
-                        <Text style={styles.notes}>標註地點</Text>
-
-                        <TextInput
-                        style={styles.title}
-                        onChangeText={text => this.setState({ placeText: text })}
-                        value={placeText}
-                        placeholder="請輸入地點"
-                        /> 
-                        
-                        <View style={styles.seperator} />
-                        <View style={{flexDirection: 'row',alignItems: 'center',}}>
-                            <Text style={styles.notes}>整日</Text>
-                            <Switch
-                                value={isHoleDaySet}
-                                onValueChange={this.handleHoleDaySet}
-                                disabled={false}
-                            />
-                        </View>
-                        <View style={styles.seperator} />
-                        <View>
+                    {task.map((item,index) => (
+                        <View style={styles.taskContainer} key={index}>
                             <Text style={styles.notes}>
-                                行程日期
+                                行程名稱
                             </Text>
-                            <TouchableOpacity 
-                                onPress={isHoleDaySet===false? (this._showDateTimePicker_start):(this._showDatePicker_start)} 
-                                style={styles.start_datetimepickButton }> 
-                                <Text style={{fontSize: 20,textAlign: 'center', color: '#fff',}}>
-                                    start
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={{ fontSize: 19 }}>
-                            {moment(selectedDay_start).format('YYYY-MM-DD, H:mm')}
-                        </Text>
-
-                        <View style={styles.seperator} />
-
-                        <TouchableOpacity 
-                            onPress={isHoleDaySet===false? (this._showDateTimePicker_end):(this._showDatePicker_end)} 
-                            style={styles.end_datetimepickButton }>
-                                <Text style={{fontSize: 20,textAlign: 'center', color: '#fff',}}>end</Text>
-                        </TouchableOpacity>
-                        <Text style={{ fontSize: 19 }}>
-                            {moment(selectedDay_end).format('YYYY-MM-DD, H:mm')}
-                        </Text>
+                            
+                            <TextInput
+                                style={styles.title}
+                                onChangeText={text => {this.setState({
+                                    taskText:[
+                                        ...taskText.slice(0, index),
+                                        text,
+                                        ...taskText.slice(index+1, this.state.task.length)
+                                    ]
+                                })}}
+                                value={taskText[index]}
+                                placeholder="請輸入行程名稱"
+                                onSubmitEditing={Keyboard.dismiss}
+                            />     
                         
-                        <View style={styles.seperator} />
+                            <View style={styles.seperator} />
+                            
+                            
+                        
+                            <Text style={styles.notes}>標註地點</Text>
 
-                        <Text style={styles.notes}>提醒時間</Text>
-                        <View style={{height: 25,marginTop: 3,}}>
-                        </View>
-                        <Picker
-                            selectedValue={this.state.alarm}
-                            mode="dialog"
-                            style={{ height: 50, width: 200 }}
-                            onValueChange={(itemValue) => this.setState({ alarm: itemValue })}>
-
-                            <Picker.Item label="無" value="no" />
-                            {isHoleDaySet === false ? (<Picker.Item label="10min" value="10min" />) :(<Picker.Item label="當日(8:00)" value="當日(8:00)" />)}
-                            {isHoleDaySet === false ? (<Picker.Item label="30min" value="30min" />) :(<Picker.Item label="前一天(20:00)" value="前一天(20:00)" />)}
-                            {isHoleDaySet === false ? (<Picker.Item label="1hr" value="1hr" />) :(<Picker.Item label="前兩天(20:00)" value="前兩天(20:00)" />)}
-                            {isHoleDaySet === false ? (<Picker.Item label="2hr" value="2hr" />) :null}
-
-                          </Picker>
+                            <TextInput
+                            style={styles.title}
+                            onChangeText={text => {this.setState({
+                                placeText:[
+                                    ...placeText.slice(0, index),
+                                    text,
+                                    ...placeText.slice(index+1, this.state.task.length)
+                                ]
+                            })}}
+                            value={placeText[index]}
+                            placeholder="請輸入地點"
+                            /> 
+                            
+                            <View style={styles.seperator} />
+{   /*                         <View style={{flexDirection: 'row',alignItems: 'center',}}>
+                                <Text style={styles.notes}>整日</Text>
+                                <Switch
+                                    value={isHoleDaySet[index]}
+                                    onValueChange={this.handleHoleDaySet}
+                                    disabled={false}
+                                />
+                            </View>
+                        <View style={styles.seperator} />*/}
+                            <View>
+                                <Text style={styles.notes}>
+                                    行程日期
+                                </Text>
+                                <TouchableOpacity 
+                                    //key={item.行程}
+                                    onPress={()=>
+                                        this._showDateTimePicker_start(index)
+                                        //console.log(index)
+                                    } 
+                                    style={styles.start_datetimepickButton }> 
+                                    <Text style={{fontSize: 20,textAlign: 'center', color: '#fff',}}>
+                                        start
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={{ fontSize: 19 }}>
+                                {moment(selectedDay_start[index]).format('YYYY-MM-DD, H:mm')}
+                            </Text>
 
                             <View style={styles.seperator} />
 
-                            <Text style={styles.notes}>
-                                備註
+                            <TouchableOpacity 
+                                //key={item.行程}
+                                onPress={()=>
+                                    this._showDateTimePicker_end(index)
+                                    //console.log(index)
+                                } 
+                                style={styles.end_datetimepickButton }>
+                                    <Text style={{fontSize: 20,textAlign: 'center', color: '#fff',}}>end</Text>
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 19 }}>
+                                {moment(selectedDay_end[index]).format('YYYY-MM-DD, H:mm')}
                             </Text>
-                            <TextInput
-                            style={styles.title}
-                            onChangeText={text =>this.setState({ notesText: text })}
-                            value={notesText}
-                            placeholder="請輸入備註"/> 
+                            
+                            <View style={styles.seperator} />
 
-                    </View>
+                            <Text style={styles.notes}>提醒時間</Text>
+                            <View style={{height: 25,marginTop: 3,}}>
+                            </View>
+                            <Picker
+                                selectedValue={alarm[index]}
+                                mode="dialog"
+                                style={{ height: 50, width: 200 }}
+                                onValueChange={itemValue => {this.setState({
+                                    alarm:[
+                                        ...alarm.slice(0, index),
+                                        itemValue,
+                                        ...alarm.slice(index+1, this.state.task.length)
+                                    ]
+                                })}}>
+
+                                {<Picker.Item label="無" value="no" />}
+                                {<Picker.Item label="10min" value="10min" />}
+                                {<Picker.Item label="30min" value="30min" />}
+                                {<Picker.Item label="1hr" value="1hr" />}
+                                {<Picker.Item label="2hr" value="2hr" />}
+
+                            </Picker>
+
+                                <View style={styles.seperator} />
+
+                                <Text style={styles.notes}>
+                                    備註
+                                </Text>
+                                <TextInput
+                                style={styles.title}
+                                onChangeText={text => {this.setState({
+                                    notesText:[
+                                        ...notesText.slice(0, index),
+                                        text,
+                                        ...notesText.slice(index+1, this.state.task.length)
+                                    ]
+                                })}}
+                                value={notesText[index]}
+                                placeholder="請輸入備註"/> 
+
+                            </View>
+                    ))}
+
                     <TouchableOpacity style={styles.createTaskButton } onPress={async () => await this._handleUpdateEventData(value)}>
                         <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                             確定
@@ -427,8 +499,8 @@ export default class HandTasks extends Component{
                 </ScrollView>
             </View>
             </>
-           )}
-          </Context.Consumer>
+            )}
+            </Context.Consumer>
         );
     }
 }
@@ -469,6 +541,7 @@ const styles = StyleSheet.create({
         padding: 22,
         opacity: 0.8,
         bottom: -100,
+        marginBottom: 30,
     },
     title: {
         height: 30,
