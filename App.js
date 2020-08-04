@@ -26,7 +26,7 @@ export default function App(props) {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide();
-        AsyncStorage.clear()
+        //AsyncStorage.clear()
         // Load our initial navigation state
 
         // Load fonts
@@ -42,19 +42,6 @@ export default function App(props) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync();
-        /*
-        fetch('http://140.115.87.178:8000/api/User.json', {
-          method: 'POST',
-          headers: { 
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json' 
-                  },
-          body: JSON.stringify({useremail:calendars[0].source.name})
-        })
-        .then((response) => JSON.stringify(response.json())) 
-        .then((responseData) => { console.log("response: " + responseData); })
-        .catch((err) => { console.log(err); });
-        */
       }
     }
     

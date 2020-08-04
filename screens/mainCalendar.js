@@ -8,32 +8,46 @@ import CalendarStrip from 'react-native-calendar-strip';
 import { OptionInCreate } from '../calendarComponent/OptionInCreate';
 import { Context } from '../data/Context';
 import { Task } from '../calendarComponent/Task';
+import {NavigationEvents} from 'react-navigation';
+
+//import { withNavigationFocus } from 'react-navigation';
 
 import handAdd from '../assets/hand_in.png';
 import photoAdd from '../assets/photo_in.png';
 
 export default class mainCalendar extends Component{//class 一定要render()
     //定義狀態
-    state = {
-      datesWhitelist: [//上方calendarstrip所有日期的list 最多可對一年後的日期做操作 也不能對以前的日期做存取
-        {
-          start: moment(),
-          end: moment().add(365, 'days'), // total one year enabled 
-        },
-      ],
-      currentDate: `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`,
-      selectedDate: `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`,
-      todoList: [],
-      markedDate: [], 
-      markedDateCalendarList: [],
-      isTaskModelVisible: false,
-      isCreateModalVisible: false,
-      selectedTask: null,
-      //isDateTimePickerVisible: false,
-    };
+    constructor(props) {
+      super(props);
+      this.state = {
+        datesWhitelist: [//上方calendarstrip所有日期的list 最多可對一年後的日期做操作 也不能對以前的日期做存取
+          {
+            start: moment(),
+            end: moment().add(365, 'days'), // total one year enabled 
+          },
+        ],
+        currentDate: `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`,
+        selectedDate: `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format('DD')}`,
+        todoList: [],
+        markedDate: [], 
+        markedDateCalendarList: [],
+        isTaskModelVisible: false,
+        isCreateModalVisible: false,
+        selectedTask: null,
+        //isDateTimePickerVisible: false,
+        time: Date.now(),
+        nowTask:[],
+      };
+      this._handleTask=this._handleTask.bind(this);
+    }
+
+    componentWillUnmount() {
+      clearInterval(this.interval);
+    }//Re-render
 
     async componentDidMount(){
       this._handleTask();
+      this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)
       console.log('this is todoList in compomentDidMount')
       console.log(this.state.todoList)
       const value = await AsyncStorage.getItem('TODO');
@@ -42,7 +56,30 @@ export default class mainCalendar extends Component{//class 一定要render()
         const markDot = todoList.map(item => item.markedDot);
         this.setState({markedDate: markDot})
       }
+
+      this.props.navigation.addListener('focus', () => {
+        this._handleTask
+        //this._updateCurrentTask(this.state.currentDate);
+      });
     }
+/*
+    handleNowTask= async ()=>{
+      try{
+        const value = await AsyncStorage.getItem('TODO');
+        if(value!==null){
+          const todoList = JSON.parse(value);
+          const nowTask1 = todoList.map((item)=>{
+            return moment(time).isBetween(item.startDate, item.endDate)
+          })
+          this.setState({nowTask:nowTask1})
+          console.log('asdf4a5sd6f45as6df78987898789ffffffffffffffffffffffffffff')
+          console.log(this.state.nowTask)
+        }
+      }catch(error){
+
+      }
+    }
+*/
 
     handleDelete = async (selected,value) => {
       Alert.alert(
@@ -58,6 +95,26 @@ export default class mainCalendar extends Component{//class 一定要render()
         ],
         { cancelable: false }
       );
+      const todo = await AsyncStorage.getItem('TODO');
+      if(todo!==null){
+        const todoList = JSON.parse(todo);
+        this.handleNowTask(todoList)
+      }
+    }
+    handleNowTask = (todoList)=>{
+      const nowTask1 = todoList.filter(item=>{
+        if(moment(this.state.time).isBetween(item.startDateTime,item.endDateTime))
+        {
+          return true
+        }
+        return false
+      })
+      this.setState({
+        nowTask: nowTask1.map(item=>{
+          return item.title
+        }),
+      });
+      
     }
 
     _handleTask = async () =>{
@@ -89,7 +146,7 @@ export default class mainCalendar extends Component{//class 一定要render()
             const todoList = JSON.parse(value);
             console.log('***************************')
             //console.log(todoList)
-
+            this.handleNowTask(todoList)
             const markDot = todoList.map(item => item.markedDot);
 
             const todoLists = todoList.filter(item => {
@@ -102,10 +159,23 @@ export default class mainCalendar extends Component{//class 一定要render()
             if (todoLists.length !== 0) {
               const sortedLists = todoLists.sort((a,b)=> {return moment(a.startDateTime).diff(b.startDateTime);})
               //const sortedLists = todoLists.sort((a,b)=>a.startDateTime.localeCompare(b.startDateTime))
+              /*
+              const nowTask1 = sortedLists.filter(item=>{
+                if(moment(this.state.time).isBetween(item.startDateTime,item.endDateTime))
+                {
+                  return true
+                }
+                return false
+              })
+              */
+
               console.log("this is sortedLists: ",sortedLists)
               this.setState({
                 markedDate: markDot,
                 todoList: sortedLists,
+                //nowTask: nowTask1.map(item=>{
+                  //return item.title
+                //}),
               });
               //console.log(this.state.todoList)
             } else {
@@ -172,6 +242,7 @@ export default class mainCalendar extends Component{//class 一定要render()
  
 
   render(){
+   
     const {
       state: {
         datesWhitelist,
@@ -183,16 +254,18 @@ export default class mainCalendar extends Component{//class 一定要render()
         isTaskModalVisible,
         isCreateModalVisible,
         selectedTask,
+        nowTask,
         //isDateTimePickerVisible,
       },
       props: { navigation },
     } = this;
 
     //const { navigation } = this.props;
-
+    {/*<NavigationEvents onWillFocus={() => console.log('you trigger me')} />*/}
 
     return(
     <Context.Consumer>
+      
     {value => (
       <>
         {selectedTask !== null &&(
@@ -204,9 +277,9 @@ export default class mainCalendar extends Component{//class 一定要render()
                       //color: '#fff',
                     }}>{selectedTask.title}</Text>
                 <View style={styles.seperator} />
-                <Text>開始: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
+                <Text>開始: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                 <View style={styles.seperator} />
-                <Text>結束: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
+                <Text>結束: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                 <View style={styles.seperator} />
                 <Text>地點: {selectedTask.place}</Text>
                 <View style={styles.seperator} />
@@ -263,6 +336,7 @@ export default class mainCalendar extends Component{//class 一定要render()
               </View>
             </Task>
         )}
+        {/*<NavigationEvents onDidFocus={() => console.log('I am triggered')} />*/}
         <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
           <CalendarStrip
                   ref={ref => {this.calendarRef = ref;}}/////////////////////////////////////////////Home頁面上方的calendar bar
@@ -340,12 +414,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                 }}>  
                 </TouchableOpacity>   
 
-{/* 
-                <TouchableOpacity 
-                  style={styles.floatinBtn222}
-                  onPress={() => {AsyncStorage.clear()}}>  
-                </TouchableOpacity>   
-*/}   
+
   
             <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
             
@@ -381,6 +450,21 @@ export default class mainCalendar extends Component{//class 一定要render()
                 contentContainerStyle={{
                   paddingBottom: 20,
                 }}>
+                  <TouchableOpacity 
+                style={styles.tomatoButton}
+                onPress = {()=> console.log('成功進入到番茄時鐘介面')}
+              >
+                <Text style = {{textAlign: 'center',fontSize: 23,marginTop: 30,}}>
+                  {moment().format('YYYY-MM-DD, h:mm:ss a')}
+                </Text>
+
+                <Text style = {{textAlign: 'center',fontSize: 20,marginTop: 20,}}>
+                  ------目前行程------
+                </Text>
+                <View style={styles.TextforNowTask}><Text style = {{textAlign: 'center',fontSize: 20, marginTop:10}}>{this.state.nowTask}</Text></View>
+                
+              </TouchableOpacity>
+
                 {todoList.map(item => (//將todolist裡面的task map到這裡一個又一個的touchableOpacity task
 
                     <TouchableOpacity //每個task都是一個 touchableOpacity
@@ -434,14 +518,14 @@ export default class mainCalendar extends Component{//class 一定要render()
                                 fontSize: 15,
                                 //marginRight: 5,
                               }}//小字顯示日期
-                            >{moment(item.startDateTime).format('YYYY-MM-DD, H:MM')}</Text>
+                            >{moment(item.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                             <Text
                               style={{
                                 color: '#BBBBBB',
                                 fontSize: 15,
                                 //marginRight: 5,
                               }}//小字顯示日期
-                            >{moment(item.endDateTime).format('YYYY-MM-DD, H:MM')}</Text>
+                            >{moment(item.endDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                           </View>
                         </View>
                       </View>
@@ -650,7 +734,27 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 18,
   },
-
+  tomatoButton: {
+    width: 300,
+    height: 250,
+    marginTop: 1,
+    marginBottom:20,
+    borderRadius: 20,
+    alignSelf: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor:'#FFEEDD',
+    
+  },
+  TextforNowTask:{
+    width: 200,
+    height: 50,
+    marginTop: 15,
+    borderRadius: 20,
+    alignSelf: 'center',
+    //justifyContent: 'flex-start',
+    backgroundColor:'#FFD9EC',
+    
+  }
 
 });
 

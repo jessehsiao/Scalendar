@@ -26,7 +26,7 @@ export default class photoScreen extends Component{
                         onPress: () => console.log("Cancel Pressed"),
                         style: "cancel"
                       },
-                      { text: "確定", onPress: () => this.props.navigation.navigate('ScanCamera')}
+                      { text: "確定", onPress: () => this.props.navigation.navigate('Camera')}
                     ],
                     { cancelable: false }
                   );
@@ -40,7 +40,7 @@ export default class photoScreen extends Component{
               console.log(err);
               Alert.alert(
                 "請求伺服器出一點問題",
-                "再試一次喔",
+                "或是您擷取或拍攝的照片有些問題，導致辨識錯誤，請重新選取或拍攝照片",
                 [
                   {
                     text: "取消",
@@ -58,8 +58,8 @@ export default class photoScreen extends Component{
     const photo=this.props.route.params.imageInPicker
     const photoBase64=this.props.route.params.photoB64
         return(
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' ,backgroundColor:'#F1E1FF'}}>
-            <Image source={{ uri: photo }} style={{ width: 350, height:600 ,resizeMode:'contain'}} />
+        <View style={{ flex: 1,backgroundColor:'#F1E1FF'}}>
+            <Image source={{ uri: photo }} style={{ justifyContent: 'flex-start' ,alignSelf: 'center',width: 350, height:600 ,resizeMode:'contain'}} />
             <TouchableOpacity style={styles.createTaskButton } onPress={()=>this.postToBackend(photoBase64)}>
                 <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                     確定
@@ -74,7 +74,8 @@ const styles = StyleSheet.create({
         width: 252,
         height: 48,
         alignSelf: 'center',
-        marginTop: -50,
+        bottom: 100,
+        //marginTop: -100,
         borderRadius: 5,
         justifyContent: 'center',
         backgroundColor:'#2E66E7',

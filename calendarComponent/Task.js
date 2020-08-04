@@ -24,7 +24,7 @@ export class Task extends React.Component {
 const styles = StyleSheet.create({
   cardMain: {
     position: 'absolute',//task視窗跳出後的樣式
-    top: 100,
+    top: 45,
     width: 327,
     borderRadius: 20,
     backgroundColor: '#ffffff',

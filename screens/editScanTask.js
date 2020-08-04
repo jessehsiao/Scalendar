@@ -75,69 +75,6 @@ export default class editScanTask extends Component{
     });
     };
 
-/*
-    handleHoleDaySet = () => {
-        //設定整日的初始日期
-        const { selectedDay_end } = this.state;
-        const selectedDatePicked_end = selectedDay_end;
-        const year_end = moment().year();
-        const month_end = moment().month();
-        const day_end = moment().date();
-        const hour_end = moment().endOf('day').hour();
-        const minute_end = moment().endOf('day').minute();
-        const selectday_end = moment(selectedDatePicked_end)
-          .year(year_end)
-          .month(month_end)
-          .date(day_end)
-          .hour(hour_end)
-          .minute(minute_end)
-        const { selectedDay_start } = this.state;
-        const selectedDatePicked_start = selectedDay_start;
-        const year = moment().year();
-        const month = moment().month();
-        const day = moment().date();
-        const hour = moment().startOf('day').hour()
-        const minute = moment().startOf('day').minute();
-        const selectday_start = moment(selectedDatePicked_start)
-          .year(year)
-          .month(month)
-          .date(day)
-          .hour(hour)
-          .minute(minute)
-        
-        const { isHoleDaySet } = this.state;
-        this.setState({
-          isHoleDaySet: !isHoleDaySet,
-        });
-        this.setState({
-            //   alarmTime: newModifiedDay,
-            selectedDay_start:selectday_start,
-            //   selectedDay_end:newModifiedDay,
-        });
-        this.setState({
-            //   alarmTime: newModifiedDay,
-            selectedDay_end:selectday_end,
-            //   selectedDay_end:newModifiedDay,
-        });
-        if(isHoleDaySet===true)//why?
-        {
-            this.setState({
-                selectedDay_start:moment().format(),
-            });
-            this.setState({
-                selectedDay_end:moment().format(),
-            });
-        }
-    };
-*/
-    //_showDatePicker_start = () => this.setState({ isDatePickerVisible_start: true });
-
-    //_hideDatePicker_start = () => this.setState({ isDatePickerVisible_start: false });
-
-    //_showDatePicker_end = () => this.setState({ isDatePickerVisible_end: true });
-
-    //_hideDatePicker_end = () => this.setState({ isDatePickerVisible_end: false });
-
     _showDateTimePicker_start = (index) => this.setState({ isDateTimePickerVisible_start: true,currentIndex:index});
 
     _hideDateTimePicker_start = () => this.setState({ isDateTimePickerVisible_start: false });
@@ -163,13 +100,11 @@ export default class editScanTask extends Component{
           .minute(minute);  
         
         this.setState({
-        //   alarmTime: newModifiedDay,
           selectedDay_start:[
             ...this.state.selectedDay_start.slice(0, this.state.currentIndex),
             selectday_start,
             ...this.state.selectedDay_start.slice(this.state.currentIndex+1, this.state.task.length)
             ]
-        //   selectedDay_end:newModifiedDay,
         });
     
         this._hideDateTimePicker_start();
@@ -205,55 +140,6 @@ export default class editScanTask extends Component{
         console.log('A date_end has been picked: ', date_end);
     };
 
-
-/*
-    _handleDatePicked_start = date_start => {
-        const { selectedDay_start } = this.state;
-        const selectedDatePicked_start = selectedDay_start;
-        const year = moment(date_start).year();
-        const month = moment(date_start).month();
-        const day = moment(date_start).date();
-        const hour = moment(date_start).startOf('day').hour()
-        const minute = moment(date_start).startOf('day').minute();
-        const selectday_start = moment(selectedDatePicked_start)
-          .year(year)
-          .month(month)
-          .date(day)
-          .hour(hour)
-          .minute(minute)
-        
-        this.setState({
-          selectedDay_start:selectday_start,
-        });
-    
-        this._hideDatePicker_start();
-        console.log('A date_start has been picked: ', date_start);
-    };
-
-    _handleDatePicked_end = date_end => {
-        const { selectedDay_end } = this.state;
-        const selectedDatePicked_end = selectedDay_end;
-        const year_end = moment(date_end).year();
-        const month_end = moment(date_end).month();
-        const day_end = moment(date_end).date();
-        const hour_end = moment(date_end).endOf('day').hour();
-        const minute_end = moment(date_end).endOf('day').minute();
-        const selectday_end = moment(selectedDatePicked_end)
-          .year(year_end)
-          .month(month_end)
-          .date(day_end)
-          .hour(hour_end)
-          .minute(minute_end)
-          
-        this.setState({
-          selectedDay_end:selectday_end,
-
-        });
-    
-        this._hideDatePicker_end();
-        console.log('A date_end has been picked: ', date_end);
-    };
-*/
     //主要更新function
     _handleUpdateEventData = async value =>{
         const {
@@ -311,7 +197,6 @@ export default class editScanTask extends Component{
                 taskText,
                 notesText,
                 placeText,
-                isHoleDaySet,
                 task,
                 alarm,
                 //currentIndex,
@@ -337,18 +222,6 @@ export default class editScanTask extends Component{
                 onCancel={this._hideDateTimePicker_end}
                 mode = 'datetime'               
             />
-{/*            <DateTimePicker
-                isVisible={this.state.isDatePickerVisible_start}
-                onConfirm={this._handleDatePicked_start}
-                onCancel={this._hideDatePicker_start}
-                mode = 'date'               
-            />
-            <DateTimePicker
-                isVisible={this.state.isDatePickerVisible_end}
-                onConfirm={this._handleDatePicked_end}
-                onCancel={this._hideDatePicker_end}
-                mode = 'date'               
-/>     */}     
             <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
                 <ScrollView contentContainerStyle={{paddingBottom: 100,}}>
                     <View>
