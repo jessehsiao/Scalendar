@@ -1,7 +1,7 @@
 import {View,Text,Image,TouchableOpacity,StyleSheet,Alert} from 'react-native';
 import React,{Component} from 'react';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default class photoScreen extends Component{
     postToBackend = async(photo) => {
@@ -58,8 +58,19 @@ export default class photoScreen extends Component{
     const photo=this.props.route.params.imageInPicker
     const photoBase64=this.props.route.params.photoB64
         return(
-        <View style={{ flex: 1,backgroundColor:'#F1E1FF'}}>
-            <Image source={{ uri: photo }} style={{ justifyContent: 'flex-start' ,alignSelf: 'center',width: 350, height:600 ,resizeMode:'contain'}} />
+        <View style={{ flex: 1}}>
+          <LinearGradient
+              // Background Linear Gradient
+              colors={['#DDD6F3', '#C9D6FF', '#FAACAB']}
+              style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              height: 800,
+              }}
+          />
+            <Image source={{ uri: photo }} style={{ justifyContent: 'flex-start' ,alignSelf: 'center',width: 350, height:600 ,resizeMode:'contain', top:20,}} />
             <TouchableOpacity style={styles.createTaskButton } onPress={()=>this.postToBackend(photoBase64)}>
                 <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                     確定
@@ -74,11 +85,11 @@ const styles = StyleSheet.create({
         width: 252,
         height: 48,
         alignSelf: 'center',
-        bottom: 100,
+        bottom: 125,
         //marginTop: -100,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'#2E66E7',
+        backgroundColor:'#8B6DBF',
     },
 
 

@@ -5,7 +5,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import uuid from 'uuid';
 import { Context } from '../data/Context';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default class editScanTask extends Component{
     state = {
@@ -223,6 +223,17 @@ export default class editScanTask extends Component{
                 mode = 'datetime'               
             />
             <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
+            <LinearGradient
+              // Background Linear Gradient
+              colors={['#DDD6F3', '#C9D6FF', '#FAACAB']}
+              style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              height: 800,
+              }}
+            />
                 <ScrollView contentContainerStyle={{paddingBottom: 100,}}>
                     <View>
                         <Text style = {styles.newTask}>
@@ -449,7 +460,7 @@ const styles = StyleSheet.create({
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'#2E66E7',
+        backgroundColor:'#8B6DBF',
     },
     backButton: {
         width: 252,
@@ -458,7 +469,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'grey',
     },
     start_datetimepickButton: {
         width: 70,
@@ -466,7 +477,7 @@ const styles = StyleSheet.create({
         marginTop: 3,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'green',
+        backgroundColor:'#8B6DBF',
     },
     end_datetimepickButton: {
         width: 70,
@@ -474,7 +485,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'pink',
+        backgroundColor:'#8B6DBF',
     },
     switchContainer: {
         position: 'absolute',

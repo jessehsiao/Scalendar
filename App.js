@@ -70,7 +70,7 @@ export default function App(props) {
               <Stack.Screen name="Calendar List" component={calendarList} options={{
                     title: 'calendar List',
                     headerStyle: {
-                      backgroundColor: '#D1BBFF',
+                      backgroundColor: '#8B6DBF',
                     },
                     headerTintColor: '#fff',
                     headerTitleStyle: {
@@ -79,7 +79,16 @@ export default function App(props) {
           }}/>
               <Stack.Screen options={{headerShown: false}} name="HandTask" component={HandTask} />
               <Stack.Screen options={{headerShown: false}} name="updateTask" component={updateTask} />
-              <Stack.Screen options={{title:'你選擇的照片'}} name="photoScreen" component={photoScreen} />
+              <Stack.Screen name="photoScreen" component={photoScreen} options={{
+                    title: '你選擇的照片',
+                    headerStyle: {
+                      backgroundColor: '#fff',
+                    },
+                    headerTintColor: '#8B6DBF',
+                    headerTitleStyle: {
+                      fontWeight: 'bold',
+                    },
+          }}/>
               <Stack.Screen options={{headerShown: false}} name="editScanTask" component={editScanTask} />
           </Stack.Navigator>
       </NavigationContainer>

@@ -9,10 +9,12 @@ import { OptionInCreate } from '../calendarComponent/OptionInCreate';
 import { Context } from '../data/Context';
 import { Task } from '../calendarComponent/Task';
 import {NavigationEvents} from 'react-navigation';
+import { LinearGradient } from 'expo-linear-gradient';
 
 //import { withNavigationFocus } from 'react-navigation';
 
 import handAdd from '../assets/hand_in.png';
+import addBtn from '../assets/addButton.png';
 import photoAdd from '../assets/photo_in.png';
 
 export default class mainCalendar extends Component{//class 一定要render()
@@ -338,6 +340,17 @@ export default class mainCalendar extends Component{//class 一定要render()
         )}
         {/*<NavigationEvents onDidFocus={() => console.log('I am triggered')} />*/}
         <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
+        <LinearGradient
+              // Background Linear Gradient
+              colors={['#DDD6F3', '#C9D6FF', '#FAACAB']}
+              style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              height: 800,
+              }}
+          />
           <CalendarStrip
                   ref={ref => {this.calendarRef = ref;}}/////////////////////////////////////////////Home頁面上方的calendar bar
                   //scrollable={true}
@@ -345,7 +358,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                   daySelectionAnimation={{//calendarstrip上日期被點擊的動畫 以及其樣式 highlight的色彩  被定義在reactNativeCalendarStrip這個套件中
                     type: 'background',
                     duration: 100,
-                    highlightColor: '#DDD6F3',//選到的日期的hightligt顏色
+                    highlightColor: '#DDD6F3',//選到的日期的hightlight顏色
                   }}
                   style={{
                     height: 150,
@@ -353,14 +366,14 @@ export default class mainCalendar extends Component{//class 一定要render()
                     paddingBottom: 20,//與這個區塊下方的距離
                   }}
                   //calendarColor={''}
-                  calendarHeaderStyle={{ color: '#000000' }}//顯示上方月分與年份的文字顏色
-                  dateNumberStyle={{ color: '#000000', paddingTop: 10 }}//顯示日期的文字顏色
-                  dateNameStyle={{ color: '#ffffff' }}//顯示星期的文字顏色
+                  calendarHeaderStyle={{ color: '#000000', }}//顯示上方月分與年份的文字顏色
+                  dateNumberStyle={{ color: '#000000', paddingTop: 10 ,fontWeight: '300',}}//顯示日期的文字顏色
+                  dateNameStyle={{ color: 'black',fontWeight: '300', }}//顯示星期的文字顏色
                   
                   //設定被select到時變化 與樣式
                   highlightDateNumberStyle={{
                     color: '#fff',
-                    backgroundColor: '#2E66E7',
+                    backgroundColor: '#8B6DBF',
                     marginTop: 10,
                     height: 35,
                     width: 35,
@@ -372,12 +385,12 @@ export default class mainCalendar extends Component{//class 一定要render()
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
-                  highlightDateNameStyle={{ color: '#ffffff' }}//被select到的日期的星期的變化
+                  
 
                   selectedDate={selectedDate}//初始時標註今日日期
 
-                  disabledDateNameStyle={{ color: 'grey' }}//設定過去日期的星期的文字顏色
-                  disabledDateNumberStyle={{ color: 'grey', paddingTop: 10 }}//設定過去日期的文字顏色
+                  //disabledDateNameStyle={{ color: 'grey' }}//設定過去日期的星期的文字顏色
+                  //disabledDateNumberStyle={{ color: 'grey', paddingTop: 10 }}//設定過去日期的文字顏色
 
                   //datesWhitelist={datesWhitelist}//可以顯示與操作的所有dateslist 瑞昕想拿掉
 
@@ -411,7 +424,10 @@ export default class mainCalendar extends Component{//class 一定要render()
                     this.setState({isCreateModalVisible: true,}, () => {
                       console.log(isCreateModalVisible)}
                     );
-                }}>  
+                }}>
+                  <View style={styles.addBtn}>
+                    <Image source={addBtn}></Image>
+                  </View>  
                 </TouchableOpacity>   
 
 
@@ -445,23 +461,28 @@ export default class mainCalendar extends Component{//class 一定要render()
               height: Dimensions.get('window').height-150,
             }}
           >
-
+          
             <ScrollView
                 contentContainerStyle={{
                   paddingBottom: 20,
-                }}>
-                  <TouchableOpacity 
+                
+                }}
+            >
+             
+              <TouchableOpacity 
                 style={styles.tomatoButton}
                 onPress = {()=> console.log('成功進入到番茄時鐘介面')}
               >
-                <Text style = {{textAlign: 'center',fontSize: 23,marginTop: 30,}}>
+                <Text style = {{textAlign: 'center',fontSize: 23,marginTop: 30, color:'grey'}}>
                   {moment().format('YYYY-MM-DD, h:mm:ss a')}
                 </Text>
 
-                <Text style = {{textAlign: 'center',fontSize: 20,marginTop: 20,}}>
+                <Text style = {{textAlign: 'center',fontSize: 20,marginTop: 40,color:'grey'}}>
                   ------目前行程------
                 </Text>
-                <View style={styles.TextforNowTask}><Text style = {{textAlign: 'center',fontSize: 20, marginTop:10}}>{this.state.nowTask}</Text></View>
+                <View style={styles.TextforNowTask}>
+                  <Text style = {{textAlign: 'center',fontSize: 25, marginTop:10, color:'white'}}>{this.state.nowTask}</Text>
+                </View>
                 
               </TouchableOpacity>
 
@@ -538,6 +559,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                         }}
                       />
                     </TouchableOpacity>
+
                   ))}
             </ScrollView>
           </View>
@@ -625,17 +647,39 @@ const styles = StyleSheet.create({
     right: 25,
     height: 60,
     width: 60,
-    backgroundColor: '#FF359A',
+    //backgroundColor: '#FF359A',
     borderRadius: 30,
-    shadowColor: '#FF34B3',
-    shadowOffset: {
+    //shadowColor: '#FF34B3',
+    /*shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowRadius: 30,
+    shadowOpacity: 0.5,*/
+    elevation: 5,
+    zIndex: 999,
+  },
+  addBtn: {
+    //position: 'relative',
+
+    //left: 225, 
+    //top: 425,
+    position: 'absolute',
+    bottom: 48,
+    right: 55,
+    height: 60,
+    width: 60,
+    //backgroundColor: '#FF359A',
+    borderRadius: 30,
+    //shadowColor: '#FF34B3',
+    /*shadowOffset: {
       width: 0,
       height: 5,
     },
     shadowRadius: 30,
     shadowOpacity: 0.5,
     elevation: 5,
-    zIndex: 999,
+    zIndex: 999,*/
   },
   taskListContent: {
     height: 100,
@@ -699,7 +743,7 @@ const styles = StyleSheet.create({
   },
 
   updateButton: {
-    backgroundColor: '#2E66E7',
+    backgroundColor: '#8B6DBF',
     width: 200,
     height: 40,
     alignSelf: 'center',
@@ -709,7 +753,7 @@ const styles = StyleSheet.create({
     //marginRight: 10,
   },
   deleteButton:{
-    backgroundColor: '#2E66E7',
+    backgroundColor: '#8B6DBF',
     width: 200,
     height: 40,
     alignSelf: 'center',
@@ -719,7 +763,7 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    backgroundColor: '#2E66E7',
+    backgroundColor: '#8B6DBF',
     width: 200,
     height: 40,
     alignSelf: 'center',
@@ -739,20 +783,23 @@ const styles = StyleSheet.create({
     height: 250,
     marginTop: 1,
     marginBottom:20,
+    borderWidth: 4,
     borderRadius: 20,
+    borderColor:'white',
     alignSelf: 'center',
     justifyContent: 'flex-start',
-    backgroundColor:'#FFEEDD',
-    
+    backgroundColor:'rgba(255,255,255,0.25)',
   },
   TextforNowTask:{
     width: 200,
     height: 50,
     marginTop: 15,
+    //borderWidth: 4,
     borderRadius: 20,
+    //borderColor:'#D0D0D0',
     alignSelf: 'center',
     //justifyContent: 'flex-start',
-    backgroundColor:'#FFD9EC',
+    backgroundColor:'#BBBBBB',
     
   }
 
