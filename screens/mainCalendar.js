@@ -60,7 +60,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       }
 
       this.props.navigation.addListener('focus', () => {
-        this._handleTask
+        this._handleTask()
         //this._updateCurrentTask(this.state.currentDate);
       });
     }
@@ -281,7 +281,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                 <View style={styles.seperator} />
                 <Text>開始: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                 <View style={styles.seperator} />
-                <Text>結束: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
+                <Text>結束: {moment(selectedTask.endDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                 <View style={styles.seperator} />
                 <Text>地點: {selectedTask.place}</Text>
                 <View style={styles.seperator} />
@@ -469,10 +469,14 @@ export default class mainCalendar extends Component{//class 一定要render()
                 }}
             >
              
-              <TouchableOpacity 
+             <TouchableOpacity 
                 style={styles.tomatoButton}
-                onPress = {()=> console.log('成功進入到番茄時鐘介面')}
-              >
+                onPress={() => {
+                  this.setState({isCreateModalVisible: false}, () =>
+                    navigation.navigate('tomato'));
+                }}
+            >
+
                 <Text style = {{textAlign: 'center',fontSize: 23,marginTop: 30, color:'grey'}}>
                   {moment().format('YYYY-MM-DD, h:mm:ss a')}
                 </Text>

@@ -14,6 +14,7 @@ import TodoStore from './data/TodoStore';
 import updateTask from './screens/updateTask';
 import photoScreen from './screens/photoScreen';
 import editScanTask from './screens/editScanTask';
+import tomato from './screens/tomato';
 import { AsyncStorage } from 'react-native';
 const Stack = createStackNavigator();
 
@@ -66,6 +67,16 @@ export default function App(props) {
           <Stack.Navigator initialRouteName="Welcome">
               <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />
               <Stack.Screen options={{title:'Home' ,headerShown: false}} name="mainCal" component={mainCalendar} />
+              <Stack.Screen name="tomato" component={tomato} options={{
+                    title: 'tomato',
+                    headerStyle: {
+                      backgroundColor: 'red',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                      fontWeight: 'bold',
+                    },
+          }}/>
               <Stack.Screen options={{headerShown: false}} name="Camera" component={ScanCamera} />
               <Stack.Screen name="Calendar List" component={calendarList} options={{
                     title: 'calendar List',
