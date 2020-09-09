@@ -82,7 +82,7 @@ export default class TodoStore extends Component {
         await AsyncStorage.setItem('TODO', JSON.stringify(newTodo));
         this.setState({
           todo: newTodo,
-        },console.log(this.state.todo));
+        },);
       } catch (error) {
         // Error saving data
       }

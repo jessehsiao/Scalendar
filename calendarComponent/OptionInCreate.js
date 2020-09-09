@@ -34,15 +34,24 @@ export class OptionInCreate extends React.Component {
 
 const styles = StyleSheet.create({
     cardMain: {
+      /*
       position: 'absolute',//task視窗跳出後的樣式
       top: 450,
       width: 327,
       borderRadius: 20,
-   
+      alignSelf: 'center',//跳出在中間
+      */
+
+      position: 'absolute',//task視窗跳出後的樣式
+      top: 450,
+      width: 327,
+      borderRadius: 20,
+      //backgroundColor: '#ffffff',
       alignSelf: 'center',//跳出在中間
     },
     container: {
       flex: 1,
-      backgroundColor: 'rgba(219,143,255,0.3)',
+      //backgroundColor: 'rgba(219,143,255,0.3)',
+      backgroundColor: 'rgba(0,0,0,0.5)',
     },
   });

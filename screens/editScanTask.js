@@ -6,14 +6,22 @@ import moment from 'moment';
 import uuid from 'uuid';
 import { Context } from '../data/Context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { PlaceInput } from '../calendarComponent/PlaceInput';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default class editScanTask extends Component{
     state = {
         currentDay: moment().format(),
         selectedDay_start: this.props.route.params.taskData.map(task => {
+            if(!("startTime" in task)){
+                return task.startDate + " " + "00:00"
+            }
             return task.startDate + " " + task.startTime
         }),
         selectedDay_end: this.props.route.params.taskData.map(task => {
+            if(!("endTime" in task)){
+                return task.endDate + " " + "23:59"
+            }
             return task.endDate + " " + task.endTime
         }),
         isDateTimePickerVisible_start: false,
@@ -38,8 +46,11 @@ export default class editScanTask extends Component{
         isHoleDaySet: this.props.route.params.taskData.map(task => {
             return false
         }),
-        
+        placeCoordinate: this.props.route.params.taskData.map(task => {
+            return ""
+        }),
         task: this.props.route.params.taskData,
+        isPlaceModalVisible:false,
         currentIndex: 0,
     };    
 
@@ -151,6 +162,7 @@ export default class editScanTask extends Component{
                 placeText,
                 alarm,
                 notesText,
+                placeCoordinate,
             },
             props: { navigation },
           } = this;
@@ -163,6 +175,7 @@ export default class editScanTask extends Component{
                 endDate: `${moment(selectedDay_end[index]).format('YYYY')}-${moment(selectedDay_end[index]).format('MM')}-${moment(selectedDay_end[index]).format('DD')}`,////新加的
                 title:taskText[index],
                 place: placeText[index],
+                placeCoordinate: placeCoordinate[index],
                 holeDay:isHoleDaySet[index],
                 startDateTime:moment(selectedDay_start[index]).format(),
                 endDateTime: moment(selectedDay_end[index]).format(),
@@ -188,6 +201,9 @@ export default class editScanTask extends Component{
         await value.updateTodo(createTodo);//////////////////////////////////////有問題 why?
         navigation.navigate('mainCal');//跳轉回mainCal頁面
     }
+    onFocus = (index) => {
+        this.setState({isPlaceModalVisible: true, currentIndex:index})
+    }
     
     render(){
         const {
@@ -199,8 +215,11 @@ export default class editScanTask extends Component{
                 placeText,
                 task,
                 alarm,
-                //currentIndex,
+                currentIndex,
                 //currentTask
+                //placeFocusIndex,
+                isPlaceModalVisible,
+                placeCoordinate,
               },
             props: { navigation },
         } = this;
@@ -234,6 +253,74 @@ export default class editScanTask extends Component{
               height: 800,
               }}
             />
+            <PlaceInput  isModalVisible={isPlaceModalVisible}>
+                <View style={styles.placeContainer}>
+                    <Text>輸入地點</Text>
+                    <GooglePlacesAutocomplete
+                            placeholder='Search'
+                            fetchDetails={true}
+                            styles={{
+                                textInputContainer: {
+                                  backgroundColor: 'rgba(0,0,0,0)',
+                                  borderTopWidth: 0,
+                                  borderBottomWidth: 0,
+                                },
+                                textInput: {
+                                  marginLeft: 0,
+                                  marginRight: 0,
+                                  height: 38,
+                                  color: '#5d5d5d',
+                                  fontSize: 16,
+                                },
+                                predefinedPlacesDescription: {
+                                  color: '#1faadb',
+                                },
+                              }}
+                            onPress={(data, details) => {
+                                // 'details' is provided when fetchDetails = true
+                                console.log(details.geometry.location);
+                                console.log(this.state.currentIndex)
+                                {this.setState({
+                                    placeText:[
+                                        ...placeText.slice(0, currentIndex),
+                                        data.terms[0].value,
+                                        ...placeText.slice(this.state.currentIndex+1, this.state.task.length)
+                                    ],
+                                    placeCoordinate:[
+                                        ...placeCoordinate.slice(0, currentIndex),
+                                        details.geometry.location,
+                                        ...placeCoordinate.slice(this.state.currentIndex+1, this.state.task.length)
+                                    ],
+                                })}
+                            }}
+                            query={{
+                                key: 'AIzaSyB2Zgbe-G468syp7Rxabj9A938U-KlljmE',
+                                language: 'en',
+                            }}
+                        />
+                    <TouchableOpacity style={styles.placeButton } onPress={() => {this.setState({isPlaceModalVisible: false})}}>
+                        <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
+                            確定
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.placeCancelButton } onPress={() => this.setState({isPlaceModalVisible: false, placeText:[
+                                        ...placeText.slice(0, currentIndex),
+                                        "",
+                                        ...placeText.slice(this.state.currentIndex+1, this.state.task.length)
+                                        ],
+                                        placeCoordinate:[
+                                            ...placeCoordinate.slice(0, currentIndex),
+                                            "",
+                                            ...placeCoordinate.slice(this.state.currentIndex+1, this.state.task.length)
+                                        ],
+                                    })} >
+                        <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
+                            取消
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </PlaceInput> 
                 <ScrollView contentContainerStyle={{paddingBottom: 100,}}>
                     <View>
                         <Text style = {styles.newTask}>
@@ -268,27 +355,20 @@ export default class editScanTask extends Component{
 
                             <TextInput
                             style={styles.title}
-                            onChangeText={text => {this.setState({
+                            /*onChangeText={text => {this.setState({
                                 placeText:[
                                     ...placeText.slice(0, index),
                                     text,
                                     ...placeText.slice(index+1, this.state.task.length)
                                 ]
-                            })}}
+                            })}}*/
+                            onFocus={()=>this.onFocus(index)}
                             value={placeText[index]}
                             placeholder="請輸入地點"
-                            /> 
+                            />
                             
                             <View style={styles.seperator} />
-{   /*                         <View style={{flexDirection: 'row',alignItems: 'center',}}>
-                                <Text style={styles.notes}>整日</Text>
-                                <Switch
-                                    value={isHoleDaySet[index]}
-                                    onValueChange={this.handleHoleDaySet}
-                                    disabled={false}
-                                />
-                            </View>
-                        <View style={styles.seperator} />*/}
+
                             <View>
                                 <Text style={styles.notes}>
                                     行程日期
@@ -299,7 +379,7 @@ export default class editScanTask extends Component{
                                         this._showDateTimePicker_start(index)
                                         //console.log(index)
                                     } 
-                                    style={styles.start_datetimepickButton }> 
+                                    style={styles.start_datetimepickButton}> 
                                     <Text style={{fontSize: 20,textAlign: 'center', color: '#fff',}}>
                                         start
                                     </Text>
@@ -494,5 +574,39 @@ const styles = StyleSheet.create({
         right: 20,
         flexDirection: 'row',
         justifyContent: 'flex-end'
+    },
+    placeContainer: {
+        height: 550,
+        width: 327,
+        alignSelf: 'center',
+        borderRadius: 20,
+        shadowColor: '#2E66E7',
+        backgroundColor: '#F1E1FF',
+        shadowOffset: {
+          width: 3,
+          height: 3,
+        },
+        shadowRadius: 20,
+        shadowOpacity: 0.2,
+        elevation: 5,
+        padding: 22,
+      },
+    placeButton: {
+        width: 252,
+        height: 48,
+        alignSelf: 'center',
+        //marginTop: 120,
+        borderRadius: 5,
+        justifyContent: 'center',
+        backgroundColor:'#8B6DBF',
+    },
+    placeCancelButton: {
+        width: 252,
+        height: 48,
+        alignSelf: 'center',
+        marginTop: 20,
+        borderRadius: 5,
+        justifyContent: 'center',
+        backgroundColor:'gray',
     },
 });

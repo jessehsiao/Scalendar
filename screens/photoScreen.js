@@ -1,9 +1,11 @@
-import {View,Text,Image,TouchableOpacity,StyleSheet,Alert} from 'react-native';
+import {View,Text,Image,TouchableOpacity,StyleSheet,Alert,ActivityIndicator} from 'react-native';
 import React,{Component} from 'react';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default class photoScreen extends Component{
+    state = { animating: false }
+
     postToBackend = async(photo) => {
         await fetch('http://140.115.87.178:8000/ocr/', {
             method: 'POST',
@@ -15,6 +17,7 @@ export default class photoScreen extends Component{
           })
           .then(response => { return response.json();})
           .then(responseData => { 
+            this.setState({animating:false})
             console.log(responseData);
             if(Object.keys(responseData[0]).length==1){
                 Alert.alert(
@@ -53,12 +56,13 @@ export default class photoScreen extends Component{
               );
             });
     }
+    
 
     render(){
     const photo=this.props.route.params.imageInPicker
     const photoBase64=this.props.route.params.photoB64
         return(
-        <View style={{ flex: 1}}>
+        <View style={{ flex: 1,justifyContent: 'center',alignItems: 'center'}}>
           <LinearGradient
               // Background Linear Gradient
               colors={['#DDD6F3', '#C9D6FF', '#FAACAB']}
@@ -70,18 +74,25 @@ export default class photoScreen extends Component{
               height: 800,
               }}
           />
-            <Image source={{ uri: photo }} style={{ justifyContent: 'flex-start' ,alignSelf: 'center',width: 350, height:600 ,resizeMode:'contain', top:20,}} />
-            <TouchableOpacity style={styles.createTaskButton } onPress={()=>this.postToBackend(photoBase64)}>
+            <ActivityIndicator
+               animating = {this.state.animating}
+               color = '#bc2b78'
+               size = "large"
+               style = {styles.activityIndicator}/>
+            <Image source={{ uri: photo }} style={styles.image} />
+            <TouchableOpacity style={styles.createTaskButton } onPress={()=>{this.postToBackend(photoBase64);this.setState({animating:true})}}>
                 <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                     確定
                 </Text>
             </TouchableOpacity>
+
+
         </View>
         );
     }
 }
 const styles = StyleSheet.create({    
-    createTaskButton: {
+    jcreateTaskButton: {
         width: 252,
         height: 48,
         alignSelf: 'center',
@@ -91,6 +102,45 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor:'#8B6DBF',
     },
+    createTaskButton: {
+      position: 'relative',
+  
+      //left: 225, 
+      //top: 425,
+      position: 'absolute',
+      bottom: 30,
+      right: 35,
+      height: 70,
+      width: 70,
+      backgroundColor: '#FF359A',
+      borderRadius: 35,
+      shadowColor: '#FF34B3',
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowRadius: 30,
+      shadowOpacity: 0.5,
+      //elevation: 5,
+      //zIndex: 999,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
+    activityIndicator: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: 80
+   },
+   image:{ 
+     flex:6,
+     justifyContent: 'flex-start',
+     bottom:50,
+     //alignSelf: 'center',
+     width: 350, 
+     height:600 ,
+     resizeMode:'contain',
+    }
 
 })

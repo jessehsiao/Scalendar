@@ -21,6 +21,14 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android":{
+      "package":"com.gmail.jesse.tw.ScanCalendar",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB2Zgbe-G468syp7Rxabj9A938U-KlljmE"
+        }
+      }
     }
   }
 }

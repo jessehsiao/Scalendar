@@ -4,7 +4,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 //import { useState } from "react";
 //const { width: vw } = Dimensions.get('window');
 import moment from 'moment';
-
+import { PlaceInput } from '../calendarComponent/PlaceInput';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Context } from '../data/Context';
 
 export default class HandTasks extends Component{
@@ -24,6 +25,8 @@ export default class HandTasks extends Component{
         alarm: this.props.route.params.selectTask.alarm,
         // keyboardHeight: 0,
         isHoleDaySet: this.props.route.params.selectTask.holeDay,
+        isPlaceModalVisible: false,
+        placeCoordinate:this.props.route.params.selectTask.placeCoordinate,
     };
     componentDidMount() {
         this.keyboardDidShowListener = Keyboard.addListener(
@@ -192,6 +195,7 @@ export default class HandTasks extends Component{
         
         this.setState({
           selectedDay_start:selectday_start,
+          //selectedDay_end:selectday_start,
         });
     
         this._hideDatePicker_start();
@@ -233,6 +237,8 @@ export default class HandTasks extends Component{
                 placeText,
                 alarm,
                 notesText,
+                placeCoordinate,
+                
             },
             props: { navigation },
           } = this;
@@ -242,6 +248,7 @@ export default class HandTasks extends Component{
             endDate: `${moment(selectedDay_end).format('YYYY')}-${moment(selectedDay_end).format('MM')}-${moment(selectedDay_end).format('DD')}`,////新加的
             title:taskText,
             place: placeText,
+            placeCoordinate:placeCoordinate,
             holeDay:isHoleDaySet,
             startDateTime:moment(selectedDay_start).format(),
             endDateTime: moment(selectedDay_end).format(),
@@ -262,9 +269,19 @@ export default class HandTasks extends Component{
                 ],
             },
         };
-        await value.updateSelectedTask(createTodo);//////////////////////////////////////有問題 why?
-        this.props.route.params.onGoBack2(createTodo.startDate);
-        navigation.navigate('mainCal');//跳轉回mainCal頁面
+        if(createTodo.title!="")
+        {
+            await value.updateSelectedTask(createTodo);
+            this.props.route.params.onGoBack2(createTodo.startDate);
+            navigation.navigate('mainCal');//跳轉回mainCal頁面
+        }
+        else
+        {
+            alert("Please input title")
+        }
+    }
+    onFocus = () => {
+        this.setState({isPlaceModalVisible: true})
     }
     
     render(){
@@ -278,6 +295,7 @@ export default class HandTasks extends Component{
                 notesText,
                 placeText,
                 isHoleDaySet,
+                isPlaceModalVisible,
               },
             props: { navigation },
         } = this;
@@ -310,7 +328,53 @@ export default class HandTasks extends Component{
                 onConfirm={this._handleDatePicked_end}
                 onCancel={this._hideDatePicker_end}
                 mode = 'date'               
-            />          
+            />
+            <PlaceInput  isModalVisible={isPlaceModalVisible}>
+                <View style={styles.placeContainer}>
+                    <Text>輸入地點</Text>
+                    <GooglePlacesAutocomplete
+                            placeholder='Search'
+                            fetchDetails={true}
+                            styles={{
+                                textInputContainer: {
+                                  backgroundColor: 'rgba(0,0,0,0)',
+                                  borderTopWidth: 0,
+                                  borderBottomWidth: 0,
+                                },
+                                textInput: {
+                                  marginLeft: 0,
+                                  marginRight: 0,
+                                  height: 38,
+                                  color: '#5d5d5d',
+                                  fontSize: 16,
+                                },
+                                predefinedPlacesDescription: {
+                                  color: '#1faadb',
+                                },
+                              }}
+                            onPress={(data, details) => {
+                                // 'details' is provided when fetchDetails = true
+                                console.log(details.geometry.location);
+                                this.setState({placeText:data.terms[0].value,placeCoordinate:details.geometry.location,})
+                            }}
+                            query={{
+                                key: 'AIzaSyB2Zgbe-G468syp7Rxabj9A938U-KlljmE',
+                                language: 'en',
+                            }}
+                        />
+                    <TouchableOpacity style={styles.placeButton } onPress={() => {this.setState({isPlaceModalVisible: false})}}>
+                        <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
+                            確定
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.placeCancelButton } onPress={() => this.setState({isPlaceModalVisible: false, placeText:"",placeCoordinate:""})} >
+                        <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
+                            取消
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </PlaceInput>          
             <View style={{flex: 1,backgroundColor: '#DDD6F3'}}>
                 <ScrollView contentContainerStyle={{paddingBottom: 100,}}>
                     <View>
@@ -339,11 +403,12 @@ export default class HandTasks extends Component{
                         <Text style={styles.notes}>標註地點</Text>
 
                         <TextInput
-                        style={styles.title}
-                        onChangeText={text => this.setState({ placeText: text })}
-                        value={placeText}
-                        placeholder="請輸入地點"
-                        /> 
+                            style={styles.title}
+                            //onChangeText={text => this.setState({ placeText: text })}
+                            onFocus={this.onFocus}
+                            value={placeText}
+                            placeholder="請輸入地點"
+                        />
                         
                         <View style={styles.seperator} />
                         <View style={{flexDirection: 'row',alignItems: 'center',}}>
@@ -537,5 +602,39 @@ const styles = StyleSheet.create({
         right: 20,
         flexDirection: 'row',
         justifyContent: 'flex-end'
+    },
+    placeContainer: {
+        height: 550,
+        width: 327,
+        alignSelf: 'center',
+        borderRadius: 20,
+        shadowColor: '#2E66E7',
+        backgroundColor: '#F1E1FF',
+        shadowOffset: {
+          width: 3,
+          height: 3,
+        },
+        shadowRadius: 20,
+        shadowOpacity: 0.2,
+        elevation: 5,
+        padding: 22,
+      },
+    placeButton: {
+        width: 252,
+        height: 48,
+        alignSelf: 'center',
+        //marginTop: 120,
+        borderRadius: 5,
+        justifyContent: 'center',
+        backgroundColor:'#8B6DBF',
+    },
+    placeCancelButton: {
+        width: 252,
+        height: 48,
+        alignSelf: 'center',
+        marginTop: 20,
+        borderRadius: 5,
+        justifyContent: 'center',
+        backgroundColor:'gray',
     },
 });

@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import handAdd from '../assets/hand_in.png';
 import addBtn from '../assets/addButton.png';
 import photoAdd from '../assets/photo_in.png';
+import back from '../assets/left-arrow.png';
 
 export default class mainCalendar extends Component{//class 一定要render()
     //定義狀態
@@ -51,7 +52,7 @@ export default class mainCalendar extends Component{//class 一定要render()
       this._handleTask();
       this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)
       console.log('this is todoList in compomentDidMount')
-      console.log(this.state.todoList)
+      //console.log(this.state.todoList)
       const value = await AsyncStorage.getItem('TODO');
       if(value!==null){
         const todoList = JSON.parse(value);
@@ -134,7 +135,7 @@ export default class mainCalendar extends Component{//class 一定要render()
     };
     handleMarkedDateCalendarList = () =>{
       const markedDatesCalendarList = this.state.markedDate.map(data=>{return moment(data.date).format('YYYY-MM-DD')})
-      console.log('這是asedfasdfasdfasdfasdfsadfa',markedDatesCalendarList)
+      //console.log('這是asedfasdfasdfasdfasdfsadfa',markedDatesCalendarList)
 
       return markedDatesCalendarList;
     }
@@ -190,8 +191,8 @@ export default class mainCalendar extends Component{//class 一定要render()
       }catch(error){
         //error
       }
-      console.log("這是markedDate")
-      console.log(this.state.markedDate)
+      //console.log("這是markedDate")
+      //console.log(this.state.markedDate)
     };
 
     returnData=(data)=>{ 
@@ -224,23 +225,16 @@ export default class mainCalendar extends Component{//class 一定要render()
         {isCreateModalVisible: false}, 
         () => {console.log(this.state.isCreateModalVisible)},);
     }
-/*
-    test=async()=>{//成功了 還在測試中
-      const calendars = await Calendar.getCalendarsAsync();
-      console.log('Here are all your calendars:1');
-      console.log(calendars[0].source.name);
-
-
-      fetch('http://140.115.87.178:8000/api/taskData.json')
-      .then(response => response.json())
-      .then(data => {data.map(item => {
-        if(item.useremail===calendars[0].source.name){
-          console.log(item)
-          return item
-        }
-      })});
+    handleTomato=()=>{
+      if(this.state.nowTask.length != 0)
+      {
+        this.props.navigation.navigate('tomato',{nowTask:this.state.nowTask[0]})
+      }
+      else
+      {
+        this.props.navigation.navigate('tomato',{nowTask:'目前無行程'})
+      }
     }
-*/
  
 
   render(){
@@ -283,7 +277,24 @@ export default class mainCalendar extends Component{//class 一定要render()
                 <View style={styles.seperator} />
                 <Text>結束: {moment(selectedTask.endDateTime).format('YYYY-MM-DD, H:mm')}</Text>
                 <View style={styles.seperator} />
-                <Text>地點: {selectedTask.place}</Text>
+                <View style={{flexDirection: 'row',alignItems: 'center',}}>
+                <Text>地點: </Text>
+                <TouchableOpacity
+                  onPress={()=>{this.setState(
+                    {isTaskModalVisible: false}, 
+                    () => {console.log(this.state.isTaskModalVisible)},), navigation.navigate('map',{selectedTask:this.state.selectedTask,todoList:this.state.todoList})}}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: 'center',
+                      color: 'red',
+                    }}
+                  >
+                    {selectedTask.place}
+                  </Text>
+                </TouchableOpacity>
+                </View>
                 <View style={styles.seperator} />
                 <Text>提醒: {selectedTask.alarm}</Text>
                 <View style={styles.seperator} />
@@ -433,26 +444,33 @@ export default class mainCalendar extends Component{//class 一定要render()
 
   
             <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
-            
-                <TouchableOpacity style={styles.handButton}  onPress={() => {
-                          this.setState({isCreateModalVisible: false}, () =>
-                            navigation.navigate('HandTask',{
-                              onGoBack2: this.returnData2
-                            }));
-                      }}>
-                  <View>
-                    <Image source={handAdd}></Image>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.photoButton} onPress={() => {
-                            navigation.navigate('Camera',{back: this.setModalfalse})
+              <View style={styles.optionContainer}>
+                <TouchableOpacity style={{bottom:16,}} onPress={() => {
+                            this.setState({isCreateModalVisible: false});
                         }}>
-                  <View>
-                    <Image source={photoAdd}></Image>
-                  </View>
-                </TouchableOpacity>
-              
+                    <View>
+                      <Image source={back}></Image>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.handButton}  onPress={() => {
+                            this.setState({isCreateModalVisible: false}, () =>
+                              navigation.navigate('HandTask',{
+                                onGoBack2: this.returnData2
+                              }));
+                        }}>
+                    <View>
+                      <Image source={handAdd}></Image>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.photoButton} onPress={() => {
+                              navigation.navigate('Camera',{back: this.setModalfalse})
+                          }}>
+                    <View>
+                      <Image source={photoAdd}></Image>
+                    </View>
+                  </TouchableOpacity>
+                </View>
             </OptionInCreate>
 
           <View
@@ -472,8 +490,7 @@ export default class mainCalendar extends Component{//class 一定要render()
              <TouchableOpacity 
                 style={styles.tomatoButton}
                 onPress={() => {
-                  this.setState({isCreateModalVisible: false}, () =>
-                    navigation.navigate('tomato'));
+                  this.setState({isCreateModalVisible: false}, () =>{this.handleTomato()});
                 }}
             >
 
@@ -485,7 +502,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                   ------目前行程------
                 </Text>
                 <View style={styles.TextforNowTask}>
-                  <Text style = {{textAlign: 'center',fontSize: 25, marginTop:10, color:'white'}}>{this.state.nowTask}</Text>
+                  <Text style = {{textAlign: 'center',fontSize: 25, marginTop:10, color:'white'}}>{this.state.nowTask[0]}</Text>
                 </View>
                 
               </TouchableOpacity>
@@ -619,12 +636,15 @@ const styles = StyleSheet.create({
   photoButton: {
     marginTop: 3,
     position: 'absolute',
-    left:10,
+    left:175,
+    bottom:5,
+    flexDirection: 'row'
   },
   handButton: {
     position: 'absolute',
     left:10,
-    bottom:30,
+    bottom:5,
+    flexDirection: 'row'
   },
   /*cancelButton: {
     bottom: 50,
@@ -805,6 +825,23 @@ const styles = StyleSheet.create({
     //justifyContent: 'flex-start',
     backgroundColor:'#BBBBBB',
     
+  },
+  optionContainer:{
+    height: 200,
+    width: 340,
+    alignSelf: 'center',
+    borderRadius: 20,
+    shadowColor: '#2E66E7',
+    backgroundColor: '#F1E1FF',
+    shadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    shadowRadius: 20,
+    shadowOpacity: 0.2,
+    //elevation: 5,
+    padding: 22,
+    bottom: 45
   }
 
 });

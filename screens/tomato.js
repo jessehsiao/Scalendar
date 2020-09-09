@@ -5,11 +5,76 @@ import CountDown from 'react-native-countdown-component';
 export default class tomato extends Component{
     constructor(props) {
         super(props);
+
         this.state = {
-            running : false,
-            until : 1500,
-            title : '番茄時鐘法',
+            running:false,
+            until:1500,
+            title:'工作中',
+            uniqueValue:1,
+            startButton:false,
+            pauseButton:true,
+            resetButton:false,
+            addMinus:false,
+            nowTask:this.props.route.params.nowTask,
+            status:"休息",
+            statusBtn:false,
         };
+    }
+    reset=()=>{
+        this.setState({uniqueValue:this.state.uniqueValue+1})
+    }
+
+    addTime=()=>{
+        if(this.state.status==="休息"){
+            this.setState({until:this.state.until+300},()=>{this.reset(),console.log(this.state.until)})
+        }
+        else{
+            if(this.state.until<1200){
+                this.setState({until:this.state.until+300},()=>{this.reset(),console.log(this.state.until)})
+            }
+        }
+    }
+    minusTime=()=>{
+        if(this.state.status==="休息"){//按鈕顯示休息=>正在工作
+            if(this.state.until>1500){
+                this.setState({until:this.state.until-300},()=>{this.reset(),console.log(this.state.until)})   
+            }
+        }
+        else{//正在休息            
+            if(this.state.until>300){
+            this.setState({until:this.state.until-300},()=>{this.reset(),console.log(this.state.until)})   
+        }}
+    }
+    handleStatusButton=()=>{
+        if(this.state.status==="休息"){
+            this.setState({title:'休息中',status:"工作",until:600},()=>{this.reset(),console.log(this.state.until)})//換成休息   
+        }
+        else{
+            this.setState({title:'工作中',status:"休息",until:1500},()=>{this.reset(),console.log(this.state.until)})
+        }
+    }
+    changeStyle=()=>{
+        if(this.state.status==="休息"){
+            return{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor:'#E6CAFF',
+            }
+        }
+        else{
+            return{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor:'#000093',
+            }
+        }
+    }
+    handleFinish=()=>{
+        alert('Finished')
+        this.setState({running: false,startButton:false,resetButton:false,addMinus:false,pauseButton:true});
+        this.handleStatusButton();
     }
 
     render(){
@@ -18,14 +83,24 @@ export default class tomato extends Component{
               running,
               until,
               title,
+              uniqueValue,
+              startButton,
+              pauseButton,
+              resetButton,
+              addMinus,
+              statusBtn,
+
             },
         } = this;
 
         return(
-            <View style = {styles.container}>
+            <View key={uniqueValue} style = {this.changeStyle()}>
                 <Text style = {styles.Title}>
-                    {title}
+                    {this.state.nowTask}
                 </Text>
+                <Text style = {styles.Title2}>
+                    {title}
+        </Text>
                 <CountDown
                     style={styles.CountDowntimer}
                     size={30}
@@ -33,68 +108,67 @@ export default class tomato extends Component{
                     timeLabels={{h:'Hour', m: 'Minute', s: 'Second'}}
                     until={until}
                     running={running}
-                    onFinish={() => alert('Finished')}
-                    digitStyle={{backgroundColor: '#FFF', borderWidth: 5, borderColor: 'red'}}
-                    digitTxtStyle={{color: 'red'}}
-                    timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
-                    separatorStyle={{color: 'red'}}            
+                    onFinish={() => {this.handleFinish()}}
+                    digitStyle={{backgroundColor: '#FFF', borderWidth: 5, borderColor: '#AAAAFF'}}
+                    digitTxtStyle={{color: '#2894FF'}}
+                    timeLabelStyle={{color: '#2894FF', fontWeight: 'bold'}}
+                    separatorStyle={{color: '#2894FF'}}            
                     showSeparator={true}
                 />
              
                 <TouchableOpacity 
-                    style={styles.Start }
-                    onPress={() => {this.setState({running: true}),this.setState({title: '任務進行中'}),console.log('start')
+                    disabled={startButton}
+                    style={styles.Start}
+                    onPress={() => {this.setState({running: true,startButton:true,resetButton:true,addMinus:true,pauseButton:false,statusBtn:true}),console.log('start')
                     }}
                 >
-                    <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
-                        開始
+                    <Text style={{fontSize:18,textAlign:'center',color: '#fff',}}>
+                        start
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
+                    disabled={pauseButton}
                     style={styles.Pause }
-                    onPress={() => {this.setState({running: false}),this.setState({title: '任務暫停中'}),console.log('pause')
-                    }}
-                >
+                    onPress={() => {this.setState({running: false,startButton:false,resetButton:false,addMinus:false,pauseButton:true,statusBtn:false}),console.log('pause')}}>
                     <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
-                        暫停
+                        pause
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                    style={styles.Restart }
-                    onPress={() => {this.setState({running: false}),
-                                    this.setState({until: until}),
-                                    console.log(until);
-                                   }
-                            }
-                >
+                    disabled={resetButton}
+                    style={styles.Restart}
+                    onPress={() => {this.reset()}}>
                     <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
-                        時間重製
+                        reset
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                disabled={addMinus}
                 style={styles.Add }
-                onPress={() => {this.setState({until: this.state.until+300}),
-                                console.log('add')
-                                }
-                        }
-                >
+                onPress={() => {this.addTime()}}>
                     <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                         +
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                disabled={addMinus}
                 style={styles.Minus }
-                onPress={() => {this.setState({until: this.state.until-300}),
-                                console.log('minus')
-                                }
-                        }
-                >
+                onPress={() => {this.minusTime()}}>
                     <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
                         -
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                disabled={statusBtn}
+                style={styles.Btn }
+                onPress={()=>{this.handleStatusButton()}}
+                >
+                    <Text style={{fontSize: 18,textAlign: 'center',fontWeight:'bold',color: '#fff',}}>
+                        {this.state.status}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -102,17 +176,19 @@ export default class tomato extends Component{
     }
 }
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor:'#EECDCD',
+
+    Title2:{
+        fontSize: 20,
+        fontWeight:'bold',
+        color:'#46A3FF',
+        top:130,
     },
     Title:{
         fontSize: 30,
         fontWeight:'bold',
-        color:'red',
-        top:120,
+        color:'#FF60AF',
+        top:140,
+        marginVertical: 20,
     },
     CountDowntimer: {
         marginTop: 1,
@@ -123,34 +199,34 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     Start: {
-        width: 252,
+        width: 180,
         height: 48,
         top:250,
         alignSelf: 'center',
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'#FF44FF',
     },
     Pause: {
-        width: 252,
+        width: 180,
         height: 48,
         top:150,
         alignSelf: 'center',
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'#66B3FF',
     },
     Restart: {
-        width: 252,
+        width: 180,
         height: 48,
         top:50,
         alignSelf: 'center',
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'#FF44FF',
     },
     Add: {
         width: 30,
@@ -160,7 +236,7 @@ const styles = StyleSheet.create({
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'#0080FF',
     },
     Minus: {
         width: 30,
@@ -170,7 +246,30 @@ const styles = StyleSheet.create({
         marginTop: 120,
         borderRadius: 5,
         justifyContent: 'center',
-        backgroundColor:'red',
+        backgroundColor:'#0080FF',
     },
+    Btn: {
+        position: 'relative',
     
+        //left: 225, 
+        //top: 425,
+        position: 'absolute',
+        bottom: 30,
+        right: 35,
+        height: 70,
+        width: 70,
+        backgroundColor: '#FF359A',
+        borderRadius: 35,
+        shadowColor: '#FF34B3',
+        shadowOffset: {
+          width: 0,
+          height: 5,
+        },
+        shadowRadius: 30,
+        shadowOpacity: 0.5,
+        //elevation: 5,
+        //zIndex: 999,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
 });
