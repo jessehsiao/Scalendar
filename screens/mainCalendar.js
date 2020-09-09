@@ -19,7 +19,8 @@ import photoAdd from '../assets/photo_in.png';
 import back from '../assets/left-arrow.png';
 
 export default class mainCalendar extends Component{//class 一定要render()
-    //定義狀態
+  //_isMounted=false
+  //定義狀態
     constructor(props) {
       super(props);
       this.state = {
@@ -44,27 +45,32 @@ export default class mainCalendar extends Component{//class 一定要render()
       this._handleTask=this._handleTask.bind(this);
     }
 
-    componentWillUnmount() {
-      clearInterval(this.interval);
-    }//Re-render
+
 
     async componentDidMount(){
-      this._handleTask();
-      this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)
-      console.log('this is todoList in compomentDidMount')
-      //console.log(this.state.todoList)
-      const value = await AsyncStorage.getItem('TODO');
-      if(value!==null){
-        const todoList = JSON.parse(value);
-        const markDot = todoList.map(item => item.markedDot);
-        this.setState({markedDate: markDot})
-      }
 
-      this.props.navigation.addListener('focus', () => {
-        this._handleTask()
-        //this._updateCurrentTask(this.state.currentDate);
-      });
+        this._handleTask();
+        this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)
+        console.log('this is todoList in compomentDidMount')
+        //console.log(this.state.todoList)
+        const value = await AsyncStorage.getItem('TODO');
+        if(value!==null){
+          const todoList = JSON.parse(value);
+          const markDot = todoList.map(item => item.markedDot);
+          this.setState({markedDate: markDot})
+        }
+  
+        this.props.navigation.addListener('focus', () => {
+          this._handleTask()
+          //this._updateCurrentTask(this.state.currentDate);
+        });
+
     }
+
+    componentWillUnmount() {
+      clearInterval(this.interval);
+      //this._isMounted=false
+    }//Re-render
 /*
     handleNowTask= async ()=>{
       try{

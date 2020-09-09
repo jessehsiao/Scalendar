@@ -1,8 +1,9 @@
 import React,{Component} from 'react';
-import {StyleSheet,Animated, View,TouchableOpacity,Text} from 'react-native';
+import {StyleSheet,Animated, View,TouchableOpacity,Text,Alert} from 'react-native';
 import CountDown from 'react-native-countdown-component';
 // import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 export default class tomato extends Component{
+    //_isMounted=false;
     constructor(props) {
         super(props);
 
@@ -72,9 +73,29 @@ export default class tomato extends Component{
         }
     }
     handleFinish=()=>{
-        alert('Finished')
-        this.setState({running: false,startButton:false,resetButton:false,addMinus:false,pauseButton:true});
-        this.handleStatusButton();
+        this.setState({running: false,startButton:false,resetButton:false,addMinus:false,pauseButton:true,statusBtn:false});
+        if(this.state.status==="休息"){
+            Alert.alert(
+                "番茄時鐘法",
+                "時間到了，休息一下吧",
+                [
+                  { text: "確定", onPress: () => {this.handleStatusButton()}}
+                ],
+                { cancelable: false }
+              );
+        }
+        else{
+            Alert.alert(
+                "番茄時鐘法",
+                "時間到了，該工作了喔",
+                [
+                  { text: "確定", onPress: () => {this.handleStatusButton()}}
+                ],
+                { cancelable: false }
+              );    
+        }
+
+        
     }
 
     render(){
@@ -89,7 +110,6 @@ export default class tomato extends Component{
               resetButton,
               addMinus,
               statusBtn,
-
             },
         } = this;
 

@@ -64,8 +64,8 @@ export default function App(props) {
     return (
       <TodoStore>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Welcome">
-              <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />
+          <Stack.Navigator initialRouteName="Home">
+              {/*<Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen} />*/}
               <Stack.Screen options={{title:'Home' ,headerShown: false}} name="mainCal" component={mainCalendar} />
               <Stack.Screen name="tomato" component={tomato} options={{
                     title: 'Tomato',
