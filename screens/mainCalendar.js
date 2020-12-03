@@ -2,7 +2,7 @@
 import React,{Component} from 'react';
 import {View, Image, TouchableOpacity, AsyncStorage, ScrollView, Text, Dimensions, TextInput, StyleSheet, Alert, Platform,} from 'react-native';
 import moment from 'moment';
-import * as Calendar from 'expo-calendar';
+//import * as Calendar from 'expo-calendar';
 import CalendarStrip from 'react-native-calendar-strip';
 //import Constants from 'expo-constants';
 import { OptionInCreate } from '../calendarComponent/OptionInCreate';
