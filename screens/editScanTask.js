@@ -31,6 +31,9 @@ export default class editScanTask extends Component{
         taskText: this.props.route.params.taskData.map(task => {
             return task.title
         }),
+        inputOrnot: this.props.route.params.taskData.map(task => {//用來判斷是否要加入至行事曆
+            return "加入"
+        }),
         placeText: this.props.route.params.taskData.map(task => {
             return ""
         }),
@@ -52,6 +55,9 @@ export default class editScanTask extends Component{
         task: this.props.route.params.taskData,
         isPlaceModalVisible:false,
         currentIndex: 0,
+        deleteTask: this.props.route.params.taskData.map(task => {//用來判斷是否要加入至行事曆
+            return "刪除"
+        }),
     };    
 
 
@@ -166,43 +172,130 @@ export default class editScanTask extends Component{
             },
             props: { navigation },
           } = this;
-
-        const createTodo=taskText.map((item,index) => {
-            const task={
-                key: uuid(),
-                //useremail:useremail,
-                startDate: `${moment(selectedDay_start[index]).format('YYYY')}-${moment(selectedDay_start[index]).format('MM')}-${moment(selectedDay_start[index]).format('DD')}`,
-                endDate: `${moment(selectedDay_end[index]).format('YYYY')}-${moment(selectedDay_end[index]).format('MM')}-${moment(selectedDay_end[index]).format('DD')}`,////新加的
-                title:taskText[index],
-                place: placeText[index],
-                placeCoordinate: placeCoordinate[index],
-                holeDay:isHoleDaySet[index],
-                startDateTime:moment(selectedDay_start[index]).format(),
-                endDateTime: moment(selectedDay_end[index]).format(),
-                alarm: alarm[index],
-                notes: notesText[index], 
-                color: `rgb(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))})`,
-                markedDot: 
-                {
-                    date: moment(selectedDay_start[index]).format(),////新加的
-                    dots: [
-                      {
-                        key: uuid(),
-                        color: '#2E66E7',
-                        selectedDotColor: '#2E66E7',
-                      },
-                    ],
-                },
+        /*const finaltaskText = taskText.filter((item,index)=>{
+            if(this.state.inputOrnot[index]==="加入"){
+                return taskText[index]
             }
-            return task;
+        })*/
+        const createTodo=taskText.map((item,index) => {
+            if(this.state.inputOrnot[index]==="加入"){
+                const task={
+                    key: uuid(),
+                    //useremail:useremail,
+                    startDate: `${moment(selectedDay_start[index]).format('YYYY')}-${moment(selectedDay_start[index]).format('MM')}-${moment(selectedDay_start[index]).format('DD')}`,
+                    endDate: `${moment(selectedDay_end[index]).format('YYYY')}-${moment(selectedDay_end[index]).format('MM')}-${moment(selectedDay_end[index]).format('DD')}`,////新加的
+                    title:taskText[index],
+                    place: placeText[index],
+                    placeCoordinate: placeCoordinate[index],
+                    holeDay:isHoleDaySet[index],
+                    startDateTime:moment(selectedDay_start[index]).format(),
+                    endDateTime: moment(selectedDay_end[index]).format(),
+                    alarm: alarm[index],
+                    notes: notesText[index], 
+                    color: `rgb(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))})`,
+                    markedDot: 
+                    {
+                        date: moment(selectedDay_start[index]).format(),////新加的
+                        dots: [
+                        {
+                            key: uuid(),
+                            color: '#2E66E7',
+                            selectedDotColor: '#2E66E7',
+                        },
+                        ],
+                    },
+                }
+                return task;
+            }
             //value.updateTodo(task);//////////////////////////////////////有問題 why?
         })
-        console.log(createTodo)
-        await value.updateTodo(createTodo);//////////////////////////////////////有問題 why?
+        const finalcreate = createTodo.filter((item,index)=>{
+            if(item!=undefined){
+                return item
+            }
+        })
+        console.log(finalcreate)
+        await value.updateTodo(finalcreate);//////////////////////////////////////有問題 why?
         navigation.navigate('mainCal');//跳轉回mainCal頁面
     }
     onFocus = (index) => {
         this.setState({isPlaceModalVisible: true, currentIndex:index})
+    }
+
+    handleDeleteTask = (index)=>{
+        if(this.state.deleteTask[index]==="刪除")
+        {
+            this.setState({
+                deleteTask:[
+                    ...this.state.deleteTask.slice(0, index),
+                    "復原",
+                    ...this.state.deleteTask.slice(index+1, this.state.task.length)
+                ],
+                inputOrnot:[
+                    ...this.state.inputOrnot.slice(0, index),
+                    "刪除",
+                    ...this.state.inputOrnot.slice(index+1, this.state.task.length)
+                ],
+            })
+        }
+        else{
+            this.setState({
+                deleteTask:[
+                    ...this.state.deleteTask.slice(0, index),
+                    "刪除",
+                    ...this.state.deleteTask.slice(index+1, this.state.task.length)
+                ],
+                inputOrnot:[
+                    ...this.state.inputOrnot.slice(0, index),
+                    "加入",
+                    ...this.state.inputOrnot.slice(index+1, this.state.task.length)
+                ],
+            })
+        }
+    }
+    changeStyle=(index)=>{
+        if(this.state.inputOrnot[index]==="加入"){
+            return{
+                height: 800,
+                width: 327,
+                alignSelf: 'center',
+                borderRadius: 20,
+                shadowColor: '#2E66E7',
+                backgroundColor: '#ffffff',
+                shadowOffset: {
+                  width: 3,
+                  height: 3,
+                },
+                shadowRadius: 20,
+                shadowOpacity: 0.2,
+                elevation: 5,
+                padding: 22,
+                opacity: 0.8,
+                bottom: -100,
+                marginBottom: 30,
+            }
+        }
+        else{
+            return{
+                height: 800,
+                width: 327,
+                alignSelf: 'center',
+                borderRadius: 20,
+                shadowColor: '#2E66E7',
+                backgroundColor: '#7B7B7B',
+                shadowOffset: {
+                  width: 3,
+                  height: 3,
+                },
+                shadowRadius: 20,
+                shadowOpacity: 0.2,
+                elevation: 5,
+                padding: 22,
+                opacity: 0.8,
+                bottom: -100,
+                marginBottom: 30,
+            }
+        }
     }
     
     render(){
@@ -216,6 +309,7 @@ export default class editScanTask extends Component{
                 task,
                 alarm,
                 currentIndex,
+                deleteTask,
                 //currentTask
                 //placeFocusIndex,
                 isPlaceModalVisible,
@@ -328,7 +422,7 @@ export default class editScanTask extends Component{
                         </Text>
                     </View>
                     {task.map((item,index) => (
-                        <View style={styles.taskContainer} key={index}>
+                        <View style={this.changeStyle(index)} key={index}>
                             <Text style={styles.notes}>
                                 行程名稱
                             </Text>
@@ -445,6 +539,12 @@ export default class editScanTask extends Component{
                                 })}}
                                 value={notesText[index]}
                                 placeholder="請輸入備註"/> 
+                                <TouchableOpacity style={styles.createTaskButton } onPress={() => {this.handleDeleteTask(index)}}>
+                                    <Text style={{fontSize: 18,textAlign: 'center', color: '#fff',}}>
+                                        {deleteTask[index]}
+                                    </Text>
+                                </TouchableOpacity>
+
 
                             </View>
                     ))}
@@ -487,25 +587,6 @@ const styles = StyleSheet.create({
         height: 25,
         textAlign: 'center',
         bottom:-70,
-    },
-    taskContainer:{
-        height: 800,
-        width: 327,
-        alignSelf: 'center',
-        borderRadius: 20,
-        shadowColor: '#2E66E7',
-        backgroundColor: '#ffffff',
-        shadowOffset: {
-          width: 3,
-          height: 3,
-        },
-        shadowRadius: 20,
-        shadowOpacity: 0.2,
-        elevation: 5,
-        padding: 22,
-        opacity: 0.8,
-        bottom: -100,
-        marginBottom: 30,
     },
     title: {
         height: 30,

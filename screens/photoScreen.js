@@ -41,6 +41,7 @@ export default class photoScreen extends Component{
         })
           .catch((err) => { 
               console.log(err);
+              this.setState({animating:false})
               Alert.alert(
                 "請求伺服器出一點問題",
                 "或是您擷取或拍攝的照片有些問題，導致辨識錯誤，請重新選取或拍攝照片",

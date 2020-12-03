@@ -10,13 +10,13 @@ import { Context } from '../data/Context';
 import { Task } from '../calendarComponent/Task';
 import {NavigationEvents} from 'react-navigation';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome,SimpleLineIcons } from '@expo/vector-icons'; 
 
 //import { withNavigationFocus } from 'react-navigation';
 
 import handAdd from '../assets/hand_in.png';
 import addBtn from '../assets/addButton.png';
 import photoAdd from '../assets/photo_in.png';
-import back from '../assets/left-arrow.png';
 
 export default class mainCalendar extends Component{//class 一定要render()
   //_isMounted=false
@@ -48,11 +48,10 @@ export default class mainCalendar extends Component{//class 一定要render()
 
 
     async componentDidMount(){
-
         this._handleTask();
-        this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)
-        console.log('this is todoList in compomentDidMount')
-        //console.log(this.state.todoList)
+        this.interval = setInterval(()=>{this.setState({time: Date.now()})} ,1000)//handle時間
+
+
         const value = await AsyncStorage.getItem('TODO');
         if(value!==null){
           const todoList = JSON.parse(value);
@@ -62,7 +61,7 @@ export default class mainCalendar extends Component{//class 一定要render()
   
         this.props.navigation.addListener('focus', () => {
           this._handleTask()
-          //this._updateCurrentTask(this.state.currentDate);
+          //this._updateCurrentTask(this.state.currentDate);//不能這樣換
         });
 
     }
@@ -90,7 +89,7 @@ export default class mainCalendar extends Component{//class 一定要render()
     }
 */
 
-    handleDelete = async (selected,value) => {
+    handleDelete = async (selected,value) => {//處理刪除
       Alert.alert(
         "確定要刪除嗎?",
         "都可以",
@@ -100,7 +99,9 @@ export default class mainCalendar extends Component{//class 一定要render()
             onPress: () => console.log("Cancel Pressed"),
             style: "cancel"
           },
-          { text: "確定", onPress: async() => {await value.deleteSelectedTask(selected);this._updateCurrentTask(this.state.selectedDate);this.setState({isTaskModalVisible: false});} }
+          { text: "確定", onPress: async() => {await value.deleteSelectedTask(selected);
+                                                this._updateCurrentTask(this.state.selectedDate);
+                                                this.setState({isTaskModalVisible: false});} }
         ],
         { cancelable: false }
       );
@@ -110,8 +111,9 @@ export default class mainCalendar extends Component{//class 一定要render()
         this.handleNowTask(todoList)
       }
     }
+
     handleNowTask = (todoList)=>{
-      const nowTask1 = todoList.filter(item=>{
+      const nowTaskTemp = todoList.filter(item=>{
         if(moment(this.state.time).isBetween(item.startDateTime,item.endDateTime))
         {
           return true
@@ -119,7 +121,7 @@ export default class mainCalendar extends Component{//class 一定要render()
         return false
       })
       this.setState({
-        nowTask: nowTask1.map(item=>{
+        nowTask: nowTaskTemp.map(item=>{
           return item.title
         }),
       });
@@ -130,8 +132,6 @@ export default class mainCalendar extends Component{//class 一定要render()
       try{
         const value = await AsyncStorage.getItem('TODO');
         if(value!==null){
-          console.log('this is value in handleTask()')
-          //console.log(value)
           this._updateCurrentTask(this.state.selectedDate);
         }
 
@@ -139,67 +139,40 @@ export default class mainCalendar extends Component{//class 一定要render()
 
       }
     };
-    handleMarkedDateCalendarList = () =>{
-      const markedDatesCalendarList = this.state.markedDate.map(data=>{return moment(data.date).format('YYYY-MM-DD')})
-      //console.log('這是asedfasdfasdfasdfasdfsadfa',markedDatesCalendarList)
-
-      return markedDatesCalendarList;
-    }
-
     _updateCurrentTask = async selectedDate =>{
       try{
-          //const selectedDate = moment(selectedDate1).format('YYYY-MM-DD')
           console.log('有進到updateCurrentTask')
           const value = await AsyncStorage.getItem('TODO');
           if(value!==null){
-            const todoList = JSON.parse(value);
-            console.log('***************************')
-            //console.log(todoList)
-            this.handleNowTask(todoList)
+            const todoList = JSON.parse(value);//拿出所有行程
+            this.handleNowTask(todoList)//拿到現在的行程
             const markDot = todoList.map(item => item.markedDot);
-
-            const todoLists = todoList.filter(item => {
+            const todoLists = todoList.filter(item => {//過濾出現在的行程
               if (selectedDate === item.startDate || moment(selectedDate).isBetween(item.startDate, item.endDate)===true || selectedDate === item.endDate) {//把當天的行程抓出來
                 return true;
               }
               return false;
             });
 
-            if (todoLists.length !== 0) {
+            if (todoLists.length !== 0) {//處理形成順序問題
               const sortedLists = todoLists.sort((a,b)=> {return moment(a.startDateTime).diff(b.startDateTime);})
-              //const sortedLists = todoLists.sort((a,b)=>a.startDateTime.localeCompare(b.startDateTime))
-              /*
-              const nowTask1 = sortedLists.filter(item=>{
-                if(moment(this.state.time).isBetween(item.startDateTime,item.endDateTime))
-                {
-                  return true
-                }
-                return false
-              })
-              */
+              this.setState({todoList: sortedLists,markedDate:markDot});
 
-              console.log("this is sortedLists: ",sortedLists)
-              this.setState({
-                markedDate: markDot,
-                todoList: sortedLists,
-                //nowTask: nowTask1.map(item=>{
-                  //return item.title
-                //}),
-              });
-              //console.log(this.state.todoList)
             } else {
-              this.setState({
-                markedDate: markDot,
-                todoList: [],
-              });
+              this.setState({todoList: [],markedDate:markDot});
             }
           }
       }catch(error){
         //error
       }
-      //console.log("這是markedDate")
-      //console.log(this.state.markedDate)
     };
+
+    handleMarkedDateCalendarList = () =>{
+      const markedDatesCalendarList = this.state.markedDate.map(data=>{return moment(data.date).format('YYYY-MM-DD')})
+      return markedDatesCalendarList;
+    }
+
+
 
     returnData=(data)=>{ 
       console.log('mainCalendar端: 剛剛從哪回來? ',data)
@@ -208,22 +181,13 @@ export default class mainCalendar extends Component{//class 一定要render()
         this.calendarRef.setSelectedDate(this.state.selectedDate);
         //this.calendarRef.updateWeekView(this.state.selectedDate);
       }) 
-
-      //console.log('Hello:',this.state.selectedDate)
-      //this.calendarRef.setSelectedDate(data);//改變標記的日子
-      //this.calendarRef.updateWeekView(data);
     }
-    returnData2=(data)=>{ 
+    returnData2=(data)=>{//建立task後來到這裡
       console.log('mainCalendar端: 剛剛從哪回來? ',data)
       this.setState({selectedDate: data}, ()=>{
-        console.log('加了測試之後:',this.state.selectedDate)
+        this._updateCurrentTask(this.state.selectedDate)
         this.calendarRef.setSelectedDate(this.state.selectedDate);
-        this._updateCurrentTask(this.state.selectedDate);
-      }) 
-
-      //console.log('Hello:',this.state.selectedDate)
-      //this.calendarRef.setSelectedDate(data);//改變標記的日子
-      //this.calendarRef.updateWeekView(data);
+      })
     }
 
     setModalfalse=()=>{
@@ -274,17 +238,24 @@ export default class mainCalendar extends Component{//class 一定要render()
             <Task  isModalVisible={isTaskModalVisible}>
               <View style={styles.taskContainer}>
                 <Text style={{
-                      fontSize: 20,
+                      fontSize: 23,
                       textAlign: 'center',
+                      fontWeight:'bold'
                       //color: '#fff',
                     }}>{selectedTask.title}</Text>
                 <View style={styles.seperator} />
-                <Text>開始: {moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
+                <View style={{flexDirection: 'row',}}>
+                  <Text style={{fontWeight:'bold',fontSize: 16,}}>開始:  </Text>
+                  <Text style={{fontSize: 16,}}>{moment(selectedTask.startDateTime).format('YYYY-MM-DD, H:mm')}</Text>
+                </View>
                 <View style={styles.seperator} />
-                <Text>結束: {moment(selectedTask.endDateTime).format('YYYY-MM-DD, H:mm')}</Text>
+                <View style={{flexDirection: 'row',}}>
+                  <Text style={{fontWeight:'bold',fontSize: 16,}}>結束:  </Text>
+                  <Text style={{fontSize: 16,}}>{moment(selectedTask.endDateTime).format('YYYY-MM-DD, H:mm')}</Text>
+                </View>
                 <View style={styles.seperator} />
                 <View style={{flexDirection: 'row',alignItems: 'center',}}>
-                <Text>地點: </Text>
+                <Text style={{fontWeight:'bold',fontSize: 16,}}>地點:  </Text>
                 <TouchableOpacity
                   onPress={()=>{this.setState(
                     {isTaskModalVisible: false}, 
@@ -292,9 +263,9 @@ export default class mainCalendar extends Component{//class 一定要render()
                 >
                   <Text
                     style={{
-                      fontSize: 18,
                       textAlign: 'center',
                       color: 'red',
+                      fontSize: 16,
                     }}
                   >
                     {selectedTask.place}
@@ -302,56 +273,66 @@ export default class mainCalendar extends Component{//class 一定要render()
                 </TouchableOpacity>
                 </View>
                 <View style={styles.seperator} />
-                <Text>提醒: {selectedTask.alarm}</Text>
+                <View style={{flexDirection: 'row',}}>
+                  <Text style={{fontWeight:'bold',fontSize: 16,}}>提醒:  </Text>
+                  <Text style={{fontSize:16,}}>{selectedTask.alarm}</Text>
+                </View>
                 <View style={styles.seperator} />
-                <Text>notes: {selectedTask.notes}</Text>
+
+                <View style={{flexDirection: 'row',}}>
+                  <Text style={{fontWeight:'bold',fontSize: 16,}}>備註:  </Text>
+                  <Text style={{fontSize: 16,}}>{selectedTask.notes}</Text>
+                </View>
                 <View style={styles.seperator} />
+                <View style={{flexDirection: 'row',justifyContent:"space-between",margin:5}}>
                 <TouchableOpacity
-                  style={styles.updateButton}
-                  onPress={()=>{this.setState(
-                    {isTaskModalVisible: false}, 
-                    () => {console.log(this.state.isTaskModalVisible)},), navigation.navigate('updateTask',{selectTask:this.state.selectedTask,onGoBack2: this.returnData2})}}
-                >
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      textAlign: 'center',
-                      color: '#fff',
-                    }}
+                    style={styles.backButton}
+                    onPress={()=>{this.setState(
+                      {isTaskModalVisible: false}, 
+                      () => {console.log(this.state.isTaskModalVisible)},);}}
                   >
-                    編輯
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={async ()=>{this.handleDelete(selectedTask,value);}}
-                >
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      textAlign: 'center',
-                      color: '#fff',
-                    }}
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      返回
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.updateButton}
+                    onPress={()=>{this.setState(
+                      {isTaskModalVisible: false}, 
+                      () => {console.log(this.state.isTaskModalVisible)},), navigation.navigate('updateTask',{selectTask:this.state.selectedTask,onGoBack2: this.returnData2})}}
                   >
-                    刪除
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={()=>{this.setState(
-                    {isTaskModalVisible: false}, 
-                    () => {console.log(this.state.isTaskModalVisible)},);}}
-                >
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      textAlign: 'center',
-                      color: '#fff',
-                    }}
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      編輯
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={async ()=>{this.handleDelete(selectedTask,value);}}
                   >
-                    返回
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      刪除
+                    </Text>
+                  </TouchableOpacity>
+
+                </View>
               </View>
             </Task>
         )}
@@ -432,7 +413,7 @@ export default class mainCalendar extends Component{//class 一定要render()
                     //selected: this.state.selectedDate,
                     markedDate:this.handleMarkedDateCalendarList(),
                     onGoBack: this.returnData,})}} style={styles.button1Style}>     
-                    <Text></Text>  
+                    <FontAwesome name="calendar" size={18} color="black" /> 
                 </TouchableOpacity> 
 
                 <TouchableOpacity 
@@ -451,12 +432,10 @@ export default class mainCalendar extends Component{//class 一定要render()
   
             <OptionInCreate  isCreateModalVisible={ isCreateModalVisible } >
               <View style={styles.optionContainer}>
-                <TouchableOpacity style={{bottom:16,}} onPress={() => {
+                <TouchableOpacity style={{bottom:12,}} onPress={() => {
                             this.setState({isCreateModalVisible: false});
                         }}>
-                    <View>
-                      <Image source={back}></Image>
-                    </View>
+                    <SimpleLineIcons name="arrow-left" size={30} color="#B15BFF" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.handButton}  onPress={() => {
                             this.setState({isCreateModalVisible: false}, () =>
@@ -607,11 +586,11 @@ const styles = StyleSheet.create({
   button1Style:{
       //padding: 150,
       //borderRadius: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-      bottom : 119,
-      //marginLeft:100,
-      width : 400,
+      //alignItems: 'center',
+      //justifyContent: 'center',
+      bottom : 121,
+      marginLeft:265,
+      //width : 400,
   },
   button1TextStyle: {
       fontSize: 20,
@@ -761,7 +740,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 20,
     shadowColor: '#2E66E7',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FAF4FF',
     shadowOffset: {
       width: 3,
       height: 3,
@@ -774,7 +753,7 @@ const styles = StyleSheet.create({
 
   updateButton: {
     backgroundColor: '#8B6DBF',
-    width: 200,
+    width: 70,
     height: 40,
     alignSelf: 'center',
     marginTop: 15,
@@ -784,7 +763,7 @@ const styles = StyleSheet.create({
   },
   deleteButton:{
     backgroundColor: '#8B6DBF',
-    width: 200,
+    width: 70,
     height: 40,
     alignSelf: 'center',
     marginTop: 15,
@@ -794,7 +773,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     backgroundColor: '#8B6DBF',
-    width: 200,
+    width: 70,
     height: 40,
     alignSelf: 'center',
     marginTop: 15,
@@ -806,7 +785,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'black',
     alignSelf: 'center',
-    marginVertical: 18,
+    marginVertical: 25,
   },
   tomatoButton: {
     width: 300,

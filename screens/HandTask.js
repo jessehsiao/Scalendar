@@ -10,8 +10,11 @@ import { Context } from '../data/Context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { PlaceInput } from '../calendarComponent/PlaceInput';
+import * as Notifications from 'expo-notifications';
+
 
 export default class HandTasks extends Component{
+
     state = {
         currentDay: moment().format(),
         //alarmTime: moment().format(),
@@ -256,6 +259,7 @@ export default class HandTasks extends Component{
             },
             props: { navigation },
           } = this;
+        //const { updateCurrentTask, selectedDate } = navigation.state.params;
         const createTodo={
             key: uuid(),
             //useremail:useremail,
@@ -285,6 +289,7 @@ export default class HandTasks extends Component{
         if(createTodo.title!="")
         {
             await value.updateTodo(createTodo);
+            //await updateCurrentTask(selectedDate);
             this.props.route.params.onGoBack2(createTodo.startDate);
             navigation.navigate('mainCal');//跳轉回mainCal頁面
         }

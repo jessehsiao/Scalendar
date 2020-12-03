@@ -48,7 +48,7 @@ export default class calendarList extends Component{
           markedDates={this.state.markedDay}
           
           onDayPress={(date) => {
-            console.log('you click this', date);
+            //console.log('you click this', date);
             //this.select.bind(this)
             const selectedDate = date.dateString;
             console.log("你在calendarList 選擇了: ",selectedDate);

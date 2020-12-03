@@ -9,12 +9,15 @@ import {
 
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 
 const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.029;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+const GOOGLE_MAPS_APIKEY = "AIzaSyB2Zgbe-G468syp7Rxabj9A938U-KlljmE"
 //0.0922
 export default class mainCalendar extends Component{
     state={
@@ -26,7 +29,9 @@ export default class mainCalendar extends Component{
                     return task;
                 }
             }
-        )
+        ),
+        deslatitude:this.props.route.params.selectedTask.placeCoordinate.lat,
+        deslongitude:this.props.route.params.selectedTask.placeCoordinate.lng,
 
     }
 
@@ -55,8 +60,19 @@ export default class mainCalendar extends Component{
                     coordinate={{latitude:marker.placeCoordinate.lat,longitude:marker.placeCoordinate.lng}}
                     title={marker.title}
                     description={moment(marker.startDateTime).format('YYYY-MM-DD, H:mm')+" ~ "+moment(marker.endDateTime).format('YYYY-MM-DD, H:mm')}
+                    onPress={e => {
+                      this.setState({deslatitude:e.nativeEvent.coordinate.latitude,deslongitude:e.nativeEvent.coordinate.longitude})
+                    }}
                     />
                 ))}
+
+                  <MapViewDirections
+                      origin={{latitude:this.state.LATITUDE,longitude:this.state.LONGITUDE}}
+                      destination={{latitude:this.state.deslatitude,longitude:this.state.deslongitude}}
+                      apikey={GOOGLE_MAPS_APIKEY}
+                      strokeWidth={3}
+                      strokeColor="blue"
+                    />
                 </MapView>
             </View>
           </View>
