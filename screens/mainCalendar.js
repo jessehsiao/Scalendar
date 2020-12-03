@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
       //alignItems: 'center',
       //justifyContent: 'center',
       bottom : 121,
-      marginLeft:265,
+      marginLeft:300,
       //width : 400,
   },
   button1TextStyle: {
