@@ -17,7 +17,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.029;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const GOOGLE_MAPS_APIKEY = "AIzaSyB2Zgbe-G468syp7Rxabj9A938U-KlljmE"
+const GOOGLE_MAPS_APIKEY = ""
 //0.0922
 export default class mainCalendar extends Component{
     state={
